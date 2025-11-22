@@ -1,7 +1,7 @@
 # OnLog Infrastructure (Terraform + GitHub Actions)
 
 온로그(OnLog) 프로젝트의 AWS 인프라를 **Terraform + GitHub Actions** 기반으로 관리하는 저장소입니다.
-모든 인프라는 코드로 정의되며(dev/prod), Git 브랜치 기반의 CI/CD 파이프라인으로 자동 배포됩니다.
+모든 인프라는 코드로 정의되며(dev/prod), Git 브랜치 기반의 CI/CD 파이프라인으로 자동 배포됩니다
 
 ---
 
