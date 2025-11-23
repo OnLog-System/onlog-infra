@@ -70,8 +70,8 @@ jobs:
           header: terraform plan
           message: ${{ steps.plan_output.outputs.stdout }}
 
-      # 9. main에 push되었을 때 apply 실행
-      - name: Terraform Apply (main push only)
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      # 9. prod에 push되었을 때 apply 실행
+      - name: Terraform Apply (prod push only)
+        if: github.ref == 'refs/heads/prod' && github.event_name == 'push'
         working-directory: ./env/prod
         run: terraform apply -auto-approve
