@@ -49,7 +49,7 @@ jobs:
       - name: Terraform Plan (PR only)
         if: github.event_name == 'pull_request'
         id: plan
-        working-directory: ./env/dev
+        working-directory: ./env/prod
         run: terraform plan -input=false -no-color | tee plan.txt
 
       # 7. plan 결과를 GITHUB_OUTPUT로 전달
@@ -72,5 +72,5 @@ jobs:
       # 9. main에 push되었을 때 apply 실행
       - name: Terraform Apply (main push only)
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        working-directory: ./env/dev
+        working-directory: ./env/prod
         run: terraform apply -auto-approve
