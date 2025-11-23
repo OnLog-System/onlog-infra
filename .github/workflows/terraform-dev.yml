@@ -48,18 +48,29 @@ jobs:
       # 6. PR일 때만 plan 수행
       - name: Terraform Plan (PR only)
         if: github.event_name == 'pull_request'
+        id: plan
         working-directory: ./env/dev
-        run: terraform plan -input=false
+        run: terraform plan -input=false -no-color | tee plan.txt
 
-      # 7. PR에 plan 결과 댓글 붙이기
+      # 7. plan 결과를 GITHUB_OUTPUT로 전달
+      - name: Capture Plan Output
+        if: github.event_name == 'pull_request'
+        id: plan_output
+        working-directory: ./env/dev
+        run: |
+          echo "stdout<<EOF" >> $GITHUB_OUTPUT
+          cat plan.txt >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      # 8. PR에 plan 결과 댓글 붙이기
       - name: Comment Plan on PR
         uses: marocchino/sticky-pull-request-comment@v2
         if: github.event_name == 'pull_request'
         with:
           header: terraform plan
-          message: "```\n${{ steps.plan.outputs.stdout }}\n```"
+          message: ${{ steps.plan_output.outputs.stdout }}
 
-      # 8. main에 push되었을 때 apply 실행
+      # 9. main에 push되었을 때 apply 실행
       - name: Terraform Apply (main push only)
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         working-directory: ./env/dev
