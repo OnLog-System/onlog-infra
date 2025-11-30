@@ -1,112 +1,148 @@
-# OnLog Infrastructure (Terraform + GitHub Actions)
+# 📘 OnLog Infrastructure (Terraform + GitHub Actions)
 
-온로그(OnLog) 프로젝트의 AWS 인프라를 **Terraform + GitHub Actions** 기반으로 관리하는 저장소입니다
-모든 인프라는 코드로 정의되며(dev/prod), Git 브랜치 기반의 CI/CD 파이프라인으로 자동 배포됩니다
+OnLog 프로젝트의 AWS 인프라는 **Terraform 기반 IaC(Infrastructure as Code)** 형태로 관리되며,
+**GitHub Actions로 dev/prod 환경에 자동 배포되는 완전한 CI/CD 파이프라인**을 제공합니다.
 
 ---
 
-## 🔧 Infrastructure Overview
-
-### 기술 스택
+# 🔧 기술 스택
 
 * **Terraform v1.14.0**
 * **AWS Provider v6.x**
 * **GitHub Actions**
-* **S3 (Terraform state 저장소)**
-* **DynamoDB (Terraform lock 관리)**
-
-### 환경 구조
-
-* `main` 브랜치 → **dev 환경 배포**
-* `prod` 브랜치 → **prod 환경 배포**
-* `env/dev` 및 `env/prod` 내의 코드가 각 환경에 반영됨
+* **S3 + DynamoDB (Terraform State & Lock)**
+* **S3 (환경 변수: tfvars 저장소)**
 
 ---
 
-## 📁 Repository Structure
+# 🏗 Infrastructure Overview
+
+## 💡 환경 분리 방식
+
+* `main` 브랜치 → **dev 환경 자동 배포**
+* `prod` 브랜치 → **prod 환경 자동 배포**
+
+## 💡 구성 특징
+
+* VPC, SG, ALB, EKS, MSK 등 모두 **modules**로 재사용 가능하게 설계
+* dev/prod 환경의 변수 값은 **tfvars(S3에서 관리)** 로 분리
+* GitHub Actions는 항상 **S3에서 최신 tfvars 읽기 → plan/apply 실행**
+
+---
+
+# 📁 Repository Structure
 
 ```
 onlog-infra/
-├── providers.tf               # 공통 AWS provider 설정
+├── .github/workflows/
+│   ├── terraform-dev.yml       # main → dev 자동 배포
+│   └── terraform-prod.yml      # prod → prod 자동 배포
+│
+├── global/
+│   └── s3/                     # tfvars 저장용 S3 버킷
+│       ├── main.tf
+│       ├── variables.tf
+│       └── outputs.tf
+│
 ├── env/
 │   ├── dev/
-│   │   ├── backend.tf         # dev state backend
-│   │   └── main.tf            # dev 인프라 정의
+│   │   ├── backend.tf          # dev backend (S3 + DynamoDB)
+│   │   ├── main.tf             # dev 인프라 정의 (모듈 호출)
+│   │   ├── variables.tf        # 환경 변수 정의
+│   │   ├── terraform.tfvars    # (gitignore) 환경별 값
+│   │   └── terraform.tfvars.example
+│   │
 │   └── prod/
-│       ├── backend.tf         # prod state backend
-│       └── main.tf            # prod 인프라 정의
-└── modules/
-    └── vpc/                   # VPC 재사용 module
-        ├── main.tf
-        ├── variables.tf
-        └── outputs.tf
+│       ├── backend.tf
+│       ├── main.tf
+│       ├── variables.tf
+│       ├── terraform.tfvars
+│       └── terraform.tfvars.example
+│
+├── modules/
+│   ├── vpc/
+│   ├── sg/
+│   ├── alb/
+│   ├── endpoints/
+│   ├── eks/
+│   ├── nodegroup/
+│   ├── msk-serverless/
+│   └── msk-provisioned/
+│
+├── providers.tf
+├── versions.tf
+└── README.md
 ```
 
 ---
 
-## 🚀 CI/CD Workflow
+# 🔐 Terraform State Backend
 
-GitHub Actions는 브랜치 기반으로 두 개의 workflow가 동작합니다.
+Terraform state는 AWS에 저장됩니다.
 
-### 1) **terraform-dev.yml**
-
-* 동작 브랜치: `main`
-* Pull Request:
-
-  * `fmt`, `validate`, `plan`
-  * plan 결과가 PR 코멘트로 자동 작성
-* main push:
-
-  * `init`, `plan`, `apply` 자동 수행 → dev 환경 배포
-
-### 2) **terraform-prod.yml**
-
-* 동작 브랜치: `prod`
-* Pull Request:
-
-  * `fmt`, `validate`, `plan`
-* prod push:
-
-  * `init`, `plan`, `apply` → prod 환경 배포
+| 항목            | 값                        |
+| ------------- | ------------------------ |
+| State Bucket  | `onlog-terraform-state`  |
+| Lock DynamoDB | `onlog-terraform-lock`   |
+| dev state 경로  | `dev/terraform.tfstate`  |
+| prod state 경로 | `prod/terraform.tfstate` |
 
 ---
 
-## 🔐 GitHub Secrets
+# 📦 tfvars 저장 구조 (중요!)
 
-아래 4개가 Actions에서 사용됩니다.
+환경 변수 파일(`terraform.tfvars`)은 보안/공개 이슈 때문에 **레포에 포함하지 않음**
+→ 대신 **전용 S3 버킷에서만 관리**합니다.
 
-### dev 환경
+### tfvars 저장 버킷
 
-* `AWS_DEV_ACCESS_KEY_ID`
-* `AWS_DEV_SECRET_ACCESS_KEY`
+* `onlog-tfvars-config`
 
-### prod 환경
+### 개발자 로컬에서 tfvars 업로드
 
-* `AWS_PROD_ACCESS_KEY_ID`
-* `AWS_PROD_SECRET_ACCESS_KEY`
+```
+aws s3 cp env/dev/terraform.tfvars s3://onlog-tfvars-config/dev.tfvars
+```
 
----
+### GitHub Actions에서는 항상 S3에서 다운로드하여 실행
 
-## 🗄 Terraform Backend (S3 + DynamoDB)
-
-모든 Terraform 상태는 S3에 저장되고 DynamoDB로 Lock을 관리합니다.
-
-* Bucket: `onlog-terraform-state`
-* Lock Table: `onlog-terraform-lock`
-* dev state 경로: `dev/terraform.tfstate`
-* prod state 경로: `prod/terraform.tfstate`
+```
+aws s3 cp s3://onlog-tfvars-config/dev.tfvars terraform.tfvars
+```
 
 ---
 
-## 🌱 Development Flow
+# 🚀 GitHub Actions (CI/CD)
+
+## ✔ terraform-dev.yml (main → dev)
+
+* PR: fmt, validate, plan → PR 댓글 자동 작성
+* main push: init + plan + apply → dev 자동 배포
+* 시작 전 S3에서 tfvars 다운로드
+
+## ✔ terraform-prod.yml (prod → prod)
+
+* prod 브랜치 동일한 방식으로 동작
+
+---
+
+# 🌱 개발/배포 Workflow
 
 1. Issue 생성
-2. Feature 브랜치 생성
-3. Terraform 코드 작성 (`env/dev`, `modules/…`)
-4. PR 생성 (→ main)
-5. PR에서 plan 결과 확인
-6. Merge → dev 환경 자동 적용
-7. 안정화 후 main → prod merge
-8. prod 환경 자동 적용
+2. feature/{task} 브랜치 생성
+3. `modules/` 또는 `env/dev`에서 Terraform 작성
+4. `terraform.tfvars` 수정 후 S3에 업로드
+   → `aws s3 cp env/dev/terraform.tfvars s3://onlog-tfvars-config/dev.tfvars`
+5. PR 생성 → GitHub Actions plan 확인
+6. Merge → dev 자동 배포
+7. 검증 후 main → prod merge → prod 자동 배포
 
 ---
+
+# 📌 요약
+
+* **tfvars는 S3에서만 관리 (레포 포함 X)**
+* **dev/prod 완전 분리**
+* **모듈 기반 구조로 확장 쉬움**
+* **GitHub Actions 자동 배포**
+* **Terraform state는 S3 + DynamoDB 백엔드**
