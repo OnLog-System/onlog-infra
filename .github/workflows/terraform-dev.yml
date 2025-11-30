@@ -30,29 +30,35 @@ jobs:
         with:
           terraform_version: 1.14.0
 
-      # 3. Terraform Init (backend 연결)
+      # 3. S3에서 환경별 terraform.tfvars 다운로드
+      #    - 항상 최신 tfvars를 기준으로 plan/apply 수행
+      - name: Download tfvars from S3
+        working-directory: ./env/dev
+        run: aws s3 cp s3://onlog-tfvars-config/dev.tfvars terraform.tfvars
+
+      # 4. Terraform Init (backend 연결)
       - name: Terraform Init
         working-directory: ./env/dev
         run: terraform init -input=false
 
-      # 4. 코드 포맷 검사
+      # 5. 코드 포맷 검사
       - name: Terraform Format
         working-directory: ./env/dev
         run: terraform fmt -check
 
-      # 5. 문법 유효성 검사
+      # 6. 문법 유효성 검사
       - name: Terraform Validate
         working-directory: ./env/dev
         run: terraform validate
 
-      # 6. PR일 때만 plan 수행
+      # 7. PR일 때만 plan 수행
       - name: Terraform Plan (PR only)
         if: github.event_name == 'pull_request'
         id: plan
         working-directory: ./env/dev
         run: terraform plan -input=false -no-color | tee plan.txt
 
-      # 7. plan 결과를 GITHUB_OUTPUT로 전달
+      # 8. PR Comment에 plan 결과 추가
       - name: Capture Plan Output
         if: github.event_name == 'pull_request'
         id: plan_output
@@ -62,7 +68,6 @@ jobs:
           cat plan.txt >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-      # 8. PR에 plan 결과 댓글 붙이기
       - name: Comment Plan on PR
         uses: marocchino/sticky-pull-request-comment@v2
         if: github.event_name == 'pull_request'
@@ -70,7 +75,13 @@ jobs:
           header: terraform plan
           message: ${{ steps.plan_output.outputs.stdout }}
 
-      # 9. main에 push되었을 때 apply 실행
+      # 9. main push 시 terraform.tfvars 변경분을 다시 S3로 업로드
+      - name: Upload updated tfvars to S3
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        working-directory: ./env/dev
+        run: aws s3 cp terraform.tfvars s3://onlog-tfvars-config/dev.tfvars
+
+      # 10. main에 push되었을 때 apply 실행
       - name: Terraform Apply (main push only)
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         working-directory: ./env/dev
