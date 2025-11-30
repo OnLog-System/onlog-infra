@@ -1,0 +1,11 @@
+vpc_cidr = ""
+
+availability_zones = []
+
+public_subnet_cidrs = []
+
+private_subnet_cidrs = []
+
+enable_nat = false
+
+single_nat_az = ""
