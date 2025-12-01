@@ -6,9 +6,12 @@ resource "aws_vpc" "main" {
   enable_dns_support   = true
   enable_dns_hostnames = true
 
-  tags = {
-    Name = "onlog-vpc"
-  }
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.environment}-vpc"
+    }
+  )
 }
 
 ############################
@@ -30,9 +33,13 @@ resource "aws_subnet" "public" {
   availability_zone       = each.value.az
   map_public_ip_on_launch = true
 
-  tags = {
-    Name = "public-${each.value.az}"
-  }
+  tags = merge(
+    var.tags,
+    {
+      Name                       = "${var.environment}-public-${each.value.az}"
+      "kubernetes.io/role/elb"   = "1"
+    }
+  )
 }
 
 # Private Subnets
@@ -49,9 +56,13 @@ resource "aws_subnet" "private" {
   cidr_block        = each.value.cidr
   availability_zone = each.value.az
 
-  tags = {
-    Name = "private-${each.value.az}-${each.key}"
-  }
+  tags = merge(
+    var.tags,
+    {
+      Name                              = "${var.environment}-private-${each.value.az}-${each.key}"
+      "kubernetes.io/role/internal-elb" = "1"
+    }
+  )
 }
 
 ############################
@@ -60,13 +71,16 @@ resource "aws_subnet" "private" {
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main.id
 
-  tags = {
-    Name = "onlog-igw"
-  }
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.environment}-igw"
+    }
+  )
 }
 
 ############################
-# 4. NAT Gateway (옵션)
+# 4. NAT Gateway
 ############################
 
 # NAT를 둘 Public Subnet 선택
@@ -85,9 +99,12 @@ locals {
 resource "aws_eip" "nat_eip" {
   count = var.enable_nat ? 1 : 0
 
-  tags = {
-    Name = "onlog-nat-eip"
-  }
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.environment}-nat-eip"
+    }
+  )
 }
 
 resource "aws_nat_gateway" "nat" {
@@ -95,9 +112,12 @@ resource "aws_nat_gateway" "nat" {
   allocation_id = aws_eip.nat_eip[0].id
   subnet_id     = local.nat_subnet_id
 
-  tags = {
-    Name = "onlog-nat"
-  }
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.environment}-nat"
+    }
+  )
 }
 
 ############################
@@ -111,9 +131,12 @@ resource "aws_route_table" "public" {
     gateway_id = aws_internet_gateway.igw.id
   }
 
-  tags = {
-    Name = "onlog-public-rt"
-  }
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.environment}-public-rt"
+    }
+  )
 }
 
 resource "aws_route_table_association" "public_assoc" {
@@ -133,9 +156,12 @@ resource "aws_route_table" "private" {
     }
   }
 
-  tags = {
-    Name = "onlog-private-rt"
-  }
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.environment}-private-rt"
+    }
+  )
 }
 
 resource "aws_route_table_association" "private_assoc" {

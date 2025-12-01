@@ -28,3 +28,9 @@ variable "single_nat_az" {
   description = "AZ where the NAT Gateway will be placed"
   type        = string
 }
+
+variable "tags" {
+  description = "Common tags to apply to all VPC resources"
+  type        = map(string)
+  default     = {}
+}
