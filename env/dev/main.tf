@@ -25,8 +25,8 @@ module "vpc" {
 module "sg_node_base" {
   source = "../../modules/sg/nodegroup"
 
-  name = "node-base"
-  vpc_id = module.vpc.vpc_id
+  name        = "node-base"
+  vpc_id      = module.vpc.vpc_id
   environment = var.environment
 
   alb_sg_ids          = []
@@ -43,7 +43,7 @@ module "sg_node_base" {
 module "sg_alb" {
   source = "../../modules/sg/alb"
 
-  name = "alb"
+  name        = "alb"
   vpc_id      = module.vpc.vpc_id
   environment = var.environment
   node_sg_ids = [module.sg_node_base.id]
@@ -58,8 +58,8 @@ module "sg_alb" {
 module "sg_controlplane" {
   source = "../../modules/sg/controlplane"
 
-  name = "controlplane"
-  vpc_id = module.vpc.vpc_id
+  name        = "controlplane"
+  vpc_id      = module.vpc.vpc_id
   environment = var.environment
 
   admin_cidrs = var.admin_cidrs
@@ -75,8 +75,8 @@ module "sg_controlplane" {
 module "sg_endpoints" {
   source = "../../modules/sg/endpoints"
 
-  name = "endpoints"
-  vpc_id = module.vpc.vpc_id
+  name        = "endpoints"
+  vpc_id      = module.vpc.vpc_id
   environment = var.environment
 
   node_sg_ids = [module.sg_node_base.id]
@@ -91,8 +91,8 @@ module "sg_endpoints" {
 module "sg_node" {
   source = "../../modules/sg/nodegroup"
 
-  name = "node"
-  vpc_id = module.vpc.vpc_id
+  name        = "node"
+  vpc_id      = module.vpc.vpc_id
   environment = var.environment
 
   alb_sg_ids          = [module.sg_alb.id]
