@@ -1,4 +1,7 @@
 variable "name" {}
+variable "environment" {
+  type = string
+}
 variable "vpc_id" {}
 
 variable "admin_cidrs" {
