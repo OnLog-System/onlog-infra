@@ -13,6 +13,8 @@ module "vpc" {
   enable_nat    = var.enable_nat
   single_nat_az = var.single_nat_az
 
+  environment = var.environment
+
   tags = var.tags
 }
 
