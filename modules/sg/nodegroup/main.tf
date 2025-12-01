@@ -1,11 +1,11 @@
 resource "aws_security_group" "node" {
-  name        = "${var.name}-node-sg"
+  name        = "${var.environment}-${var.name}-sg"
   description = "EKS NodeGroup SG"
   vpc_id      = var.vpc_id
 
   # Allow ALB → NodeGroup
   ingress {
-    description     = "ALB → NodeGroup"
+    description     = "ALB to NodeGroup"
     from_port       = var.app_port_min
     to_port         = var.app_port_max
     protocol        = "tcp"
@@ -14,7 +14,7 @@ resource "aws_security_group" "node" {
 
   # Allow NodeGroup internal communication (Pod ↔ Pod, Node ↔ Node)
   ingress {
-    description = "Node ↔ Node internal"
+    description = "Node internal communication"
     from_port   = 0
     to_port     = 65535
     protocol    = "tcp"
@@ -23,7 +23,7 @@ resource "aws_security_group" "node" {
 
   # Allow Control Plane → NodeGroup
   ingress {
-    description     = "ControlPlane → Node"
+    description     = "ControlPlane to Node"
     from_port       = 10250
     to_port         = 10250
     protocol        = "tcp"
@@ -32,7 +32,7 @@ resource "aws_security_group" "node" {
 
   # Outbound: Node → AWS Endpoints
   egress {
-    description     = "Node → Endpoints"
+    description     = "Node to Endpoints"
     from_port       = 443
     to_port         = 443
     protocol        = "tcp"

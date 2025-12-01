@@ -1,5 +1,5 @@
 resource "aws_security_group" "controlplane" {
-  name        = "${var.name}-controlplane-sg"
+  name        = "${var.environment}-${var.name}-sg"
   description = "EKS Control Plane SG"
   vpc_id      = var.vpc_id
 
@@ -14,7 +14,7 @@ resource "aws_security_group" "controlplane" {
 
   # NodeGroup → ControlPlane (health check, kubelet)
   ingress {
-    description     = "NodeGroup → ControlPlane"
+    description     = "NodeGroup to ControlPlane"
     from_port       = 1025
     to_port         = 65535
     protocol        = "tcp"
@@ -23,7 +23,7 @@ resource "aws_security_group" "controlplane" {
 
   # Outbound: ControlPlane → NodeGroup
   egress {
-    description     = "ControlPlane → Node"
+    description     = "ControlPlane to Node"
     from_port       = 1025
     to_port         = 65535
     protocol        = "tcp"

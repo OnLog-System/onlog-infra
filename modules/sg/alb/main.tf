@@ -1,9 +1,9 @@
 resource "aws_security_group" "alb" {
-  name        = "${var.name}-alb-sg"
+  name        = "${var.environment}-${var.name}-sg"
   description = "Security Group for ALB"
   vpc_id      = var.vpc_id
 
-  # Inbound: Internet → ALB
+  # Inbound: Internet to ALB
   ingress {
     description = "HTTP"
     from_port   = 80
@@ -22,7 +22,7 @@ resource "aws_security_group" "alb" {
 
   # Outbound: ALB → NodeGroup
   egress {
-    description     = "ALB → NodeGroup"
+    description     = "ALB to NodeGroup"
     from_port       = 0
     to_port         = 65535
     protocol        = "tcp"
