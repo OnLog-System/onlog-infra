@@ -25,7 +25,7 @@ module "vpc" {
 module "sg_node_base" {
   source = "../../modules/sg/nodegroup"
 
-  name = "node"
+  name = "node-base"
   vpc_id = module.vpc.vpc_id
   environment = var.environment
 
