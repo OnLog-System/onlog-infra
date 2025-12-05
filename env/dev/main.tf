@@ -101,3 +101,28 @@ module "sg_node" {
 
   tags = var.tags
 }
+
+############################################################
+# 7. VPC Endpoint Module
+############################################################
+
+module "endpoints" {
+  source = "../../modules/endpoints"
+
+  region      = var.region
+  environment = var.environment
+  vpc_id      = module.vpc.vpc_id
+
+  # Interface Endpoint Subnets: private
+  endpoint_subnet_ids = module.vpc.private_subnet_ids
+
+  # Interface Endpoint SG
+  endpoint_sg_id = module.sg_endpoints.id
+
+  # Gateway Endpoint Route Tables
+  private_route_table_ids = [
+    module.vpc.private_route_table_id
+  ]
+
+  tags = var.tags
+}
