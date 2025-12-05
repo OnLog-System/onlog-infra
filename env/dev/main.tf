@@ -113,10 +113,12 @@ module "endpoints" {
   environment = var.environment
   vpc_id      = module.vpc.vpc_id
 
-  # Interface Endpoint Subnets: private
-  endpoint_subnet_ids = module.vpc.private_subnet_ids
+  # Interface Endpoint Subnets: pick 1 per AZ
+  endpoint_subnet_ids = [
+    module.vpc.private_subnet_ids[0],  # az-1
+    module.vpc.private_subnet_ids[1],  # az-2
+  ]
 
-  # Interface Endpoint SG
   endpoint_sg_id = module.sg_endpoints.id
 
   # Gateway Endpoint Route Tables
