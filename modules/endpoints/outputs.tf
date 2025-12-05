@@ -8,7 +8,7 @@ output "dynamodb_endpoint_id" {
 
 output "interface_endpoint_ids" {
   value = {
-    for k, ep in aws_vpc_endpoint.interface :
-    k => ep.id
+    for name, ep in aws_vpc_endpoint.interface :
+    name => ep.id
   }
 }
