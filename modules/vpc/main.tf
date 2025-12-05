@@ -61,6 +61,12 @@ resource "aws_subnet" "private" {
     {
       Name                              = "${var.environment}-private-${each.value.az}-${each.key}"
       "kubernetes.io/role/internal-elb" = "1"
+
+      subnet-type = (
+        each.key < length(var.private_subnet_cidrs) / 2 ?
+        "app" :
+        "data"
+      )
     }
   )
 }
