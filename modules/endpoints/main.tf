@@ -1,5 +1,5 @@
 ###############################################
-# 1. Gateway Endpoints (S3, DynamoDB)
+# 1. Gateway Endpoints
 ###############################################
 
 resource "aws_vpc_endpoint" "s3" {
@@ -33,7 +33,7 @@ resource "aws_vpc_endpoint" "dynamodb" {
 }
 
 ###############################################
-# 2. Interface Endpoints (SSM, ECR, etc.)
+# 2. Interface Endpoints
 ###############################################
 
 # 재사용 가능한 helper 로직
