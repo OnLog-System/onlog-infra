@@ -25,3 +25,11 @@ output "public_route_table_id" {
 output "private_route_table_id" {
   value = aws_route_table.private.id
 }
+
+output "app_private_subnets_by_az" {
+  value = {
+    for s in aws_subnet.private :
+    s.availability_zone => s.id
+    if lookup(s.tags, "subnet-type", "") == "app"
+  }
+}
