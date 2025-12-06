@@ -145,4 +145,4 @@ aws s3 cp s3://onlog-tfvars-config/dev.tfvars terraform.tfvars
 * **dev/prod 완전 분리**
 * **모듈 기반 구조로 확장 쉬움**
 * **GitHub Actions 자동 배포**
-* **Terraform state는 S3 + DynamoDB 백엔드**
+* **Terraform state는 S3 + DynamoDB 백엔드**.
