@@ -155,7 +155,7 @@ module "nat_instance" {
   region             = var.region
   instance_type      = var.nat_instance_type
   subnet_id          = module.vpc.public_subnet_ids[0]    # ap-northeast-2a
-  security_group_id  = module.sg_nat.id
+  security_group_id  = module.sg_nat["enabled"].id
   ami_id             = "ami-0b2c2a754d12345" # Amazon NAT AMI ID (서울 리전) #맞는지 확인!
   tags               = var.tags
 }
