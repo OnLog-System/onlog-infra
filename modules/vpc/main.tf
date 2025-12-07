@@ -154,11 +154,21 @@ resource "aws_route_table_association" "public_assoc" {
 resource "aws_route_table" "private" {
   vpc_id = aws_vpc.main.id
 
+  # NAT Gateway Route
   dynamic "route" {
     for_each = var.enable_nat ? [1] : []
     content {
       cidr_block     = "0.0.0.0/0"
       nat_gateway_id = aws_nat_gateway.nat[0].id
+    }
+  }
+
+  # NAT Instance Route
+  dynamic "route" {
+    for_each = (!var.enable_nat && var.nat_instance_id != null) ? [1] : []
+    content {
+      cidr_block = "0.0.0.0/0"
+      instance_id = var.nat_instance_id
     }
   }
 

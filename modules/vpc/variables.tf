@@ -38,3 +38,8 @@ variable "tags" {
 variable "environment" {
   type = string
 }
+
+variable "nat_instance_id" {
+  type    = string
+  default = null
+}
