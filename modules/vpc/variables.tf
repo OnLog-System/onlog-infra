@@ -24,7 +24,7 @@ variable "enable_nat_gateway" {
   default     = true
 }
 
-variable "single_nat_az" {
+variable "nat_az" {
   description = "AZ where the NAT Gateway will be placed"
   type        = string
 }
