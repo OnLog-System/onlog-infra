@@ -3,16 +3,16 @@ resource "aws_security_group" "nat" {
   description = "Security group for NAT Instance"
   vpc_id      = var.vpc_id
 
-  # Inbound (Private Subnet → NAT)
+  # Allow all incoming traffic from private subnets
   ingress {
-    description = "Private Subnet to NAT"
+    description = "Private Subnet → NAT"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = var.private_cidrs
   }
 
-  # Outbound → Internet 가능
+  # NAT → Internet
   egress {
     description = "NAT to Internet"
     from_port   = 0
