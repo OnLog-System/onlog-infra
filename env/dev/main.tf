@@ -10,13 +10,13 @@ module "vpc" {
   public_subnet_cidrs  = var.public_subnet_cidrs
   private_subnet_cidrs = var.private_subnet_cidrs
 
-  enable_nat      = var.enable_nat_gateway
+  enable_nat_gateway      = var.enable_nat_gateway
   single_nat_az   = var.single_nat_az
 
   # NAT Instance (optional)
-  nat_instance_id = (
+  nat_network_interface_id = (
     var.enable_nat_instance
-    ? module.nat_instance["enabled"].nat_instance_id
+    ? module.nat_instance["enabled"].nat_network_interface_id
     : null
   )
 
