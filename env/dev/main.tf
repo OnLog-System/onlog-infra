@@ -10,12 +10,18 @@ module "vpc" {
   public_subnet_cidrs  = var.public_subnet_cidrs
   private_subnet_cidrs = var.private_subnet_cidrs
 
-  enable_nat    = var.enable_nat_gateway
-  single_nat_az = var.single_nat_az
-  nat_instance_id = module.nat_instance.nat_instance_id
+  enable_nat      = var.enable_nat_gateway
+  single_nat_az   = var.single_nat_az
+
+  # NAT Instance (optional)
+  nat_instance_id = (
+    var.enable_nat_instance
+    ? module.nat_instance["enabled"].nat_instance_id
+    : null
+  )
 
   environment = var.environment
-  tags = var.tags
+  tags        = var.tags
 }
 
 ############################################################
@@ -144,18 +150,17 @@ module "sg_nat" {
 
 
 ############################################################
-# 9. NAT Instance Module
+# 9. NAT Instance Module (ASG 기반)
 ############################################################
 
 module "nat_instance" {
   source = "../../modules/nat-instance"
-  for_each = var.enable_nat_instance ? { enabled = true } : {} # true 일 때만 생성
+  for_each = var.enable_nat_instance ? { enabled = true } : {}
 
-  environment        = var.environment
-  region             = var.region
-  instance_type      = var.nat_instance_type
-  subnet_id          = module.vpc.public_subnet_ids[0]    # ap-northeast-2a
-  security_group_id  = module.sg_nat["enabled"].id
-  ami_id             = "ami-0b2c2a754d12345" # Amazon NAT AMI ID (서울 리전) #맞는지 확인!
-  tags               = var.tags
+  environment       = var.environment
+  region            = var.region
+  instance_type     = var.nat_instance_type
+  subnet_id         = module.vpc.public_subnet_ids[0]
+  security_group_id = module.sg_nat["enabled"].id
+  tags              = var.tags
 }
