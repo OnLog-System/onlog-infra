@@ -5,7 +5,7 @@ resource "aws_security_group" "nat" {
 
   # Allow all incoming traffic from private subnets
   ingress {
-    description = "Private Subnet → NAT"
+    description = "Private Subnet to NAT"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
