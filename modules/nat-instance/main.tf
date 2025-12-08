@@ -1,18 +1,72 @@
+#############################################
+# 1) 최신 Amazon Linux 2023 AMI 자동 검색
+#############################################
+data "aws_ami" "al2023" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["al2023-ami-*-arm64"]
+  }
+}
+
+#############################################
+# 2) NAT Instance용 ENI 생성
+#############################################
+resource "aws_network_interface" "nat" {
+  subnet_id         = var.subnet_id
+  security_groups   = [var.security_group_id]
+  source_dest_check = false   # 중요!
+
+  tags = merge(
+    var.tags,
+    { Name = "${var.environment}-nat-eni" }
+  )
+}
+
+#############################################
+# 3) NAT Instance용 EIP 생성 및 ENI 연결
+#############################################
+resource "aws_eip" "nat" {
+  vpc = true
+
+  tags = merge(
+    var.tags,
+    { Name = "${var.environment}-nat-eip" }
+  )
+}
+
+resource "aws_eip_association" "nat" {
+  allocation_id        = aws_eip.nat.id
+  network_interface_id = aws_network_interface.nat.id
+}
+
+#############################################
+# 4) Launch Template
+#############################################
 resource "aws_launch_template" "nat" {
-  name_prefix = "${var.environment}-nat-"
-  image_id    = var.ami_id
+  name_prefix   = "${var.environment}-nat-"
+  image_id      = data.aws_ami.al2023.id
   instance_type = var.instance_type
 
   network_interfaces {
-    associate_public_ip_address = true
-    security_groups             = [var.security_group_id]
-    subnet_id                   = var.subnet_id
+    network_interface_id = aws_network_interface.nat.id
   }
 
   user_data = base64encode(<<EOF
 #!/bin/bash
-sysctl -w net.ipv4.ip_forward=1
+yum install -y iptables-services
+
+systemctl enable iptables
+systemctl start iptables
+
+echo 'net.ipv4.ip_forward = 1' > /etc/sysctl.d/ipforward.conf
+sysctl -p /etc/sysctl.d/ipforward.conf
+
 iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+iptables -F FORWARD
+service iptables save
 EOF
   )
 
@@ -20,20 +74,19 @@ EOF
     resource_type = "instance"
     tags = merge(
       var.tags,
-      {
-        Name = "${var.environment}-nat-instance"
-      }
+      { Name = "${var.environment}-nat-instance" }
     )
   }
 }
 
+#############################################
+# 5) AutoScaling Group (NAT = 항상 1개)
+#############################################
 resource "aws_autoscaling_group" "nat" {
-  name                      = "${var.environment}-nat-asg"
-  desired_capacity          = 1
-  max_size                  = 1
-  min_size                  = 1
-  health_check_type         = "EC2"
-  health_check_grace_period = 30
+  name               = "${var.environment}-nat-asg"
+  desired_capacity   = 1
+  max_size           = 1
+  min_size           = 1
 
   vpc_zone_identifier = [var.subnet_id]
 
@@ -47,22 +100,4 @@ resource "aws_autoscaling_group" "nat" {
     value               = "${var.environment}-nat"
     propagate_at_launch = true
   }
-}
-
-# EIP 생성
-resource "aws_eip" "nat" {
-  vpc        = true
-
-  tags = merge(
-    var.tags,
-    {
-      Name = "${var.environment}-nat-eip"
-    }
-  )
-}
-
-# EIP → NAT Instance 연결 (ASG는 instance_id를 직접 가리킬 수 없으므로)
-resource "aws_eip_association" "nat" {
-  allocation_id = aws_eip.nat.id
-  instance_id   = aws_autoscaling_group.nat.instances[0].id
 }
