@@ -18,7 +18,7 @@ variable "availability_zones" {
   type        = list(string)
 }
 
-variable "enable_nat" {
+variable "enable_nat_gateway" {
   description = "Whether to create a NAT gateway"
   type        = bool
   default     = true
@@ -37,4 +37,14 @@ variable "tags" {
 
 variable "environment" {
   type = string
+}
+
+variable "nat_instance_id" {
+  type    = string
+  default = null
+}
+
+variable "nat_network_interface_id" {
+  type    = string
+  default = null
 }

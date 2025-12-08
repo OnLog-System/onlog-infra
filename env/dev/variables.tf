@@ -38,14 +38,6 @@ variable "private_subnet_cidrs" {
   type = list(string)
 }
 
-variable "enable_nat" {
-  type = bool
-}
-
-variable "single_nat_az" {
-  type = string
-}
-
 ############################################################
 # EKS ControlPlane 관련
 ############################################################
@@ -56,7 +48,7 @@ variable "admin_cidrs" {
 }
 
 ############################################################
-# VPC Endpoint 관련 설정
+# VPC Endpoint 설정
 ############################################################
 
 variable "endpoint_subnet_group" {
@@ -65,8 +57,13 @@ variable "endpoint_subnet_group" {
 }
 
 ############################################################
-# NAT Instance 옵션 (나중 대비)
+# NAT 관련 설정
 ############################################################
+
+variable "enable_nat_gateway" {
+  type    = bool
+  default = false
+}
 
 variable "enable_nat_instance" {
   type    = bool
@@ -78,7 +75,7 @@ variable "nat_instance_type" {
   default = "t4g.nano"
 }
 
-variable "nat_instance_az" {
-  type    = string
-  default = "ap-northeast-2a"
+variable "single_nat_az" {
+  type = string
 }
+

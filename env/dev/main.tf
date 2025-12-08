@@ -10,12 +10,18 @@ module "vpc" {
   public_subnet_cidrs  = var.public_subnet_cidrs
   private_subnet_cidrs = var.private_subnet_cidrs
 
-  enable_nat    = var.enable_nat
-  single_nat_az = var.single_nat_az
+  enable_nat_gateway = var.enable_nat_gateway
+  single_nat_az      = var.single_nat_az
+
+  # NAT Instance (optional)
+  nat_network_interface_id = (
+    var.enable_nat_instance
+    ? module.nat_instance["enabled"].nat_network_interface_id
+    : null
+  )
 
   environment = var.environment
-
-  tags = var.tags
+  tags        = var.tags
 }
 
 ############################################################
@@ -124,4 +130,37 @@ module "endpoints" {
   ]
 
   tags = var.tags
+}
+
+
+############################################################
+# 8. SG: NAT
+############################################################
+
+module "sg_nat" {
+  source   = "../../modules/sg/nat"
+  for_each = var.enable_nat_instance ? { enabled = true } : {}
+
+  name          = "nat"
+  vpc_id        = module.vpc.vpc_id
+  environment   = var.environment
+  private_cidrs = var.private_subnet_cidrs
+  tags          = var.tags
+}
+
+
+############################################################
+# 9. NAT Instance Module (ASG 기반)
+############################################################
+
+module "nat_instance" {
+  source   = "../../modules/nat-instance"
+  for_each = var.enable_nat_instance ? { enabled = true } : {}
+
+  environment       = var.environment
+  region            = var.region
+  instance_type     = var.nat_instance_type
+  subnet_id         = module.vpc.public_subnet_ids[0]
+  security_group_id = module.sg_nat["enabled"].id
+  tags              = var.tags
 }
