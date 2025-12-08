@@ -95,7 +95,7 @@ locals {
     var.enable_nat_gateway ?
     aws_subnet.public[
       element(
-        [for k, v in aws_subnet.public : k if v.availability_zone == var.single_nat_az],
+        [for k, v in aws_subnet.public : k if v.availability_zone == var.nat_az],
         0
       )
     ].id : null

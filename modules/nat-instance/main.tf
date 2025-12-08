@@ -89,6 +89,8 @@ resource "aws_autoscaling_group" "nat" {
   max_size           = 1
   min_size           = 1
 
+  availability_zones = [var.nat_az]
+
   launch_template {
     id      = aws_launch_template.nat.id
     version = "$Latest"

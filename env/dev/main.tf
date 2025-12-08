@@ -11,7 +11,7 @@ module "vpc" {
   private_subnet_cidrs = var.private_subnet_cidrs
 
   enable_nat_gateway = var.enable_nat_gateway
-  single_nat_az      = var.single_nat_az
+  nat_az             = var.nat_az
 
   # NAT Instance (optional)
   nat_network_interface_id = (
@@ -162,5 +162,6 @@ module "nat_instance" {
   instance_type     = var.nat_instance_type
   subnet_id         = module.vpc.public_subnet_ids[0]
   security_group_id = module.sg_nat["enabled"].id
+  nat_az            = var.nat_az
   tags              = var.tags
 }

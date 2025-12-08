@@ -75,7 +75,7 @@ variable "nat_instance_type" {
   default = "t4g.nano"
 }
 
-variable "single_nat_az" {
+variable "nat_az" {
   type = string
 }
 
