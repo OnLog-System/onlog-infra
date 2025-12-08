@@ -1,3 +1,3 @@
-output "nat_instance_id" {
-  value = try(aws_autoscaling_group.nat.instances[0], null)
+output "nat_network_interface_id" {
+  value = aws_network_interface.nat.id
 }

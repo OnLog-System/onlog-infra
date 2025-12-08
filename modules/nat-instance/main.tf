@@ -29,7 +29,7 @@ resource "aws_network_interface" "nat" {
 # 3) NAT Instance용 EIP 생성 및 ENI 연결
 #############################################
 resource "aws_eip" "nat" {
-  vpc = true
+  domain = "vpc"
 
   tags = merge(
     var.tags,
