@@ -92,7 +92,7 @@ resource "aws_internet_gateway" "igw" {
 # NAT를 둘 Public Subnet 선택
 locals {
   nat_subnet_id = (
-    var.enable_nat ?
+    var.enable_nat_gateway ?
     aws_subnet.public[
       element(
         [for k, v in aws_subnet.public : k if v.availability_zone == var.single_nat_az],
@@ -103,7 +103,7 @@ locals {
 }
 
 resource "aws_eip" "nat_eip" {
-  count = var.enable_nat ? 1 : 0
+  count = var.enable_nat_gateway ? 1 : 0
 
   tags = merge(
     var.tags,
@@ -114,7 +114,7 @@ resource "aws_eip" "nat_eip" {
 }
 
 resource "aws_nat_gateway" "nat" {
-  count         = var.enable_nat ? 1 : 0
+  count         = var.enable_nat_gateway ? 1 : 0
   allocation_id = aws_eip.nat_eip[0].id
   subnet_id     = local.nat_subnet_id
 
@@ -156,19 +156,19 @@ resource "aws_route_table" "private" {
 
   # NAT Gateway
   dynamic "route" {
-    for_each = var.enable_nat ? [1] : []
+    for_each = var.enable_nat_gateway ? [1] : []
     content {
       cidr_block     = "0.0.0.0/0"
       nat_gateway_id = aws_nat_gateway.nat[0].id
     }
   }
 
-  # NAT Instance (ASG)
+  # NAT Instance Route
   dynamic "route" {
-    for_each = (!var.enable_nat && var.nat_instance_id != null) ? [1] : []
+    for_each = (!var.enable_nat_gateway && var.nat_network_interface_id != null) ? [1] : []
     content {
-      cidr_block  = "0.0.0.0/0"
-      instance_id = var.nat_instance_id
+      cidr_block = "0.0.0.0/0"
+      network_interface_id = var.nat_network_interface_id
     }
   }
 

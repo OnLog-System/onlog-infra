@@ -15,7 +15,7 @@ output "igw_id" {
 }
 
 output "nat_gateway_id" {
-  value = var.enable_nat ? aws_nat_gateway.nat[0].id : null
+  value = var.enable_nat_gateway ? aws_nat_gateway.nat[0].id : null
 }
 
 output "public_route_table_id" {
