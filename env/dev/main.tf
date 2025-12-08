@@ -10,8 +10,8 @@ module "vpc" {
   public_subnet_cidrs  = var.public_subnet_cidrs
   private_subnet_cidrs = var.private_subnet_cidrs
 
-  enable_nat_gateway      = var.enable_nat_gateway
-  single_nat_az   = var.single_nat_az
+  enable_nat_gateway = var.enable_nat_gateway
+  single_nat_az      = var.single_nat_az
 
   # NAT Instance (optional)
   nat_network_interface_id = (
@@ -138,7 +138,7 @@ module "endpoints" {
 ############################################################
 
 module "sg_nat" {
-  source = "../../modules/sg/nat"
+  source   = "../../modules/sg/nat"
   for_each = var.enable_nat_instance ? { enabled = true } : {}
 
   name          = "nat"
@@ -154,7 +154,7 @@ module "sg_nat" {
 ############################################################
 
 module "nat_instance" {
-  source = "../../modules/nat-instance"
+  source   = "../../modules/nat-instance"
   for_each = var.enable_nat_instance ? { enabled = true } : {}
 
   environment       = var.environment
