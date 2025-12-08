@@ -154,7 +154,7 @@ resource "aws_route_table_association" "public_assoc" {
 resource "aws_route_table" "private" {
   vpc_id = aws_vpc.main.id
 
-  # NAT Gateway Route
+  # NAT Gateway
   dynamic "route" {
     for_each = var.enable_nat ? [1] : []
     content {
@@ -163,22 +163,21 @@ resource "aws_route_table" "private" {
     }
   }
 
-  # NAT Instance Route
+  # NAT Instance (ASG)
   dynamic "route" {
     for_each = (!var.enable_nat && var.nat_instance_id != null) ? [1] : []
     content {
-      cidr_block = "0.0.0.0/0"
+      cidr_block  = "0.0.0.0/0"
       instance_id = var.nat_instance_id
     }
   }
 
   tags = merge(
     var.tags,
-    {
-      Name = "${var.environment}-private-rt"
-    }
+    { Name = "${var.environment}-private-rt" }
   )
 }
+
 
 resource "aws_route_table_association" "private_assoc" {
   for_each       = aws_subnet.private
