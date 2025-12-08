@@ -17,7 +17,7 @@ data "aws_ami" "al2023" {
 resource "aws_network_interface" "nat" {
   subnet_id         = var.subnet_id
   security_groups   = [var.security_group_id]
-  source_dest_check = false   # 중요!
+  source_dest_check = false
 
   tags = merge(
     var.tags,
@@ -52,6 +52,7 @@ resource "aws_launch_template" "nat" {
 
   network_interfaces {
     network_interface_id = aws_network_interface.nat.id
+    device_index         = 0
   }
 
   user_data = base64encode(<<EOF
