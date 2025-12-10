@@ -15,6 +15,15 @@ variable "tags" {
 }
 
 ###############################################
+# For Gateway Endpoints
+###############################################
+
+variable "private_route_table_ids" {
+  description = "Private Route Table IDs for Gateway Endpoints"
+  type        = list(string)
+}
+
+###############################################
 # For Interface Endpoints
 ###############################################
 
@@ -29,10 +38,11 @@ variable "endpoint_sg_id" {
 }
 
 ###############################################
-# For Gateway Endpoints
+# For EC2 Instance Connect Endpoint
 ###############################################
 
-variable "private_route_table_ids" {
-  description = "Private Route Table IDs for Gateway Endpoints"
-  type        = list(string)
+variable "eice_sg_id" {
+  description = "SG ID for EC2 Instance Connect Endpoint"
+  type = string
 }
+
