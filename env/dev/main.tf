@@ -38,6 +38,7 @@ module "sg_node_base" {
   alb_sg_ids          = []
   controlplane_sg_ids = []
   endpoint_sg_ids     = []
+  eice_sg_ids         = []
 
   tags = var.tags
 }
@@ -104,6 +105,7 @@ module "sg_node" {
   alb_sg_ids          = [module.sg_alb.id]
   controlplane_sg_ids = [module.sg_controlplane.id]
   endpoint_sg_ids     = [module.sg_endpoints.id]
+  eice_sg_ids         = [module.sg_eice.id]
 
   tags = var.tags
 }

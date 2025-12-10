@@ -30,6 +30,15 @@ resource "aws_security_group" "node" {
     security_groups = var.controlplane_sg_ids
   }
 
+  # Allow EICE → Node (SSH)
+  ingress {
+    description     = "EICE to Node SSH"
+    from_port       = 22
+    to_port         = 22
+    protocol        = "tcp"
+    security_groups = var.eice_sg_ids
+  }
+
   # Outbound: Node → AWS Endpoints
   egress {
     description     = "Node to Endpoints"
