@@ -109,7 +109,19 @@ module "sg_node" {
 }
 
 ############################################################
-# 7. VPC Endpoint Module
+# 7. SG: EICE
+############################################################
+
+module "sg_eice" {
+  source      = "../../modules/sg/eice"
+  name        = "eice"
+  vpc_id      = module.vpc.vpc_id
+  environment = var.environment
+  tags        = var.tags
+}
+
+############################################################
+# 8. VPC Endpoints + EICE
 ############################################################
 
 module "endpoints" {
@@ -123,6 +135,7 @@ module "endpoints" {
   endpoint_subnet_ids = values(module.vpc.app_private_subnets_by_az)
 
   endpoint_sg_id = module.sg_endpoints.id
+  eice_sg_id     = module.sg_eice.id
 
   # Gateway Endpoint Route Tables
   private_route_table_ids = [
@@ -134,7 +147,7 @@ module "endpoints" {
 
 
 ############################################################
-# 8. SG: NAT
+# 9. SG: NAT
 ############################################################
 
 module "sg_nat" {
@@ -150,7 +163,7 @@ module "sg_nat" {
 
 
 ############################################################
-# 9. NAT Instance Module (ASG 기반)
+# 10. NAT Instance Module (ASG 기반)
 ############################################################
 
 module "nat_instance" {
