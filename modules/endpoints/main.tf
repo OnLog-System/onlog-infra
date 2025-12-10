@@ -36,12 +36,11 @@ resource "aws_vpc_endpoint" "dynamodb" {
 # 2. Interface Endpoints
 ###############################################
 
-# 재사용 가능한 helper 로직
 locals {
   interface_services = {
-    ssm          = "com.amazonaws.${var.region}.ssm"
-    ssmmessages  = "com.amazonaws.${var.region}.ssmmessages"
-    ec2messages  = "com.amazonaws.${var.region}.ec2messages"
+    # ssm          = "com.amazonaws.${var.region}.ssm"
+    # ssmmessages  = "com.amazonaws.${var.region}.ssmmessages"
+    # ec2messages  = "com.amazonaws.${var.region}.ec2messages"
     ecr_api      = "com.amazonaws.${var.region}.ecr.api"
     ecr_docker   = "com.amazonaws.${var.region}.ecr.dkr"
   }
@@ -65,4 +64,18 @@ resource "aws_vpc_endpoint" "interface" {
       Name = "${var.environment}-${each.key}-endpoint"
     }
   )
+}
+
+###############################################
+# 3. EC2 Instance Connect Endpoint (EICE)
+###############################################
+
+resource "aws_ec2_instance_connect_endpoint" "eice" {
+  vpc_id = var.vpc_id
+  subnet_id = var.endpoint_subnet_ids[0]
+  security_group_ids = [var.eice_sg_id]
+
+  tags = merge(var.tags, {
+    Name = "${var.environment}-eice-endpoint"
+  })
 }
