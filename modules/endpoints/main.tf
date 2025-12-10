@@ -41,9 +41,8 @@ locals {
     # ssm          = "com.amazonaws.${var.region}.ssm"
     # ssmmessages  = "com.amazonaws.${var.region}.ssmmessages"
     # ec2messages  = "com.amazonaws.${var.region}.ec2messages"
-    ecr_api       = "com.amazonaws.${var.region}.ecr.api"
-    ecr_docker    = "com.amazonaws.${var.region}.ecr.dkr"
-    sts           = "com.amazonaws.${var.region}.sts"
+    ecr_api      = "com.amazonaws.${var.region}.ecr.api"
+    ecr_docker   = "com.amazonaws.${var.region}.ecr.dkr"
   }
 }
 
