@@ -12,3 +12,7 @@ output "interface_endpoint_ids" {
     name => ep.id
   }
 }
+
+output "eice_id" {
+  value = aws_ec2_instance_connect_endpoint.eice.id
+}
