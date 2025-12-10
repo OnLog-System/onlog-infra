@@ -71,7 +71,6 @@ resource "aws_vpc_endpoint" "interface" {
 ###############################################
 
 resource "aws_ec2_instance_connect_endpoint" "eice" {
-  vpc_id               = var.vpc_id
   subnet_id            = var.endpoint_subnet_ids[0]
   security_group_ids   = [var.eice_sg_id]
 
