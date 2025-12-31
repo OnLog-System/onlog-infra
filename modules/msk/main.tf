@@ -49,12 +49,6 @@ resource "aws_msk_cluster" "this" {
         volume_size = var.ebs_volume_size
         }
       }
-
-    connectivity_info {
-      public_access {
-        type = "SERVICE_PROVIDED_EIPS"
-        }
-      }
     }
 
   configuration_info {
