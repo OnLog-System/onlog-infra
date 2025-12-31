@@ -28,7 +28,7 @@ EOF
 ###############################################
 resource "aws_cloudwatch_log_group" "this" {
   name              = "/aws/msk/${var.environment}-${var.name}"
-  retention_in_days = 14
+  retention_in_days = 31
 }
 
 ###############################################
@@ -47,6 +47,12 @@ resource "aws_msk_cluster" "this" {
     storage_info {
       ebs_storage_info {
         volume_size = var.ebs_volume_size
+        }
+      }
+
+    connectivity_info {
+      public_access {
+        type = "SERVICE_PROVIDED_EIPS"
         }
       }
     }
