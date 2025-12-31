@@ -46,5 +46,5 @@ output "sg_endpoints" {
 ############################################################
 output "msk_bootstrap_brokers_iam" {
   description = "MSK IAM bootstrap brokers"
-  value = var.enable_msk ? module.msk[0].bootstrap_brokers_iam : null
+  value       = var.enable_msk ? module.msk[0].bootstrap_brokers_iam : null
 }

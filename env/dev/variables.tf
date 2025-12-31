@@ -84,6 +84,6 @@ variable "nat_az" {
 #############################################################
 
 variable "enable_msk" {
-  type        = bool
-  default     = true
+  type    = bool
+  default = true
 }
