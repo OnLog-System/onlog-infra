@@ -28,7 +28,7 @@ EOF
 ###############################################
 resource "aws_cloudwatch_log_group" "this" {
   name              = "/aws/msk/${var.environment}-${var.name}"
-  retention_in_days = 31
+  retention_in_days = 30
 }
 
 ###############################################
