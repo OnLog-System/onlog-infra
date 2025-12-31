@@ -79,3 +79,12 @@ variable "nat_az" {
   type = string
 }
 
+#############################################################
+# Enable 관리
+#############################################################
+
+variable "enable_msk" {
+  type        = bool
+  description = "Enable MSK cluster"
+  default     = false
+}

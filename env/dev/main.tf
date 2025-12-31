@@ -199,6 +199,7 @@ module "sg_msk" {
 # 12. MSK Cluster
 ############################################################
 module "msk" {
+  count                = var.enable_msk ? 1 : 0
   source               = "../../modules/msk"
   name                 = "msk"
   environment          = var.environment
