@@ -203,7 +203,7 @@ module "msk" {
   source               = "../../modules/msk"
   name                 = "msk"
   environment          = var.environment
-  kafka_version        = "3.8.0"
+  kafka_version        = "3.8.x"
   availability_zones   = var.availability_zones
   brokers_per_az       = 1
   subnet_ids           = values(module.vpc.data_private_subnets_by_az)
