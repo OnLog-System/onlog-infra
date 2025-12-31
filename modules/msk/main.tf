@@ -10,17 +10,18 @@ resource "aws_msk_configuration" "this" {
 auto.create.topics.enable=false
 default.replication.factor=2
 min.insync.replicas=1
-num.io.threads=8
-num.network.threads=5
 num.partitions=2
-num.replica.fetchers=2
-replica.lag.time.max.ms=30000
-socket.receive.buffer.bytes=102400
-socket.request.max.bytes=104857600
-socket.send.buffer.bytes=102400
 unclean.leader.election.enable=false
 EOF
 }
+
+# num.io.threads=8
+# num.network.threads=5
+# num.replica.fetchers=2
+# replica.lag.time.max.ms=30000
+# socket.receive.buffer.bytes=102400
+# socket.request.max.bytes=104857600
+# socket.send.buffer.bytes=102400
 
 ###############################################
 # 2. Log Group
