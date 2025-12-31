@@ -33,5 +33,4 @@ variable "brokers_per_az" {
 
 variable "enable_msk_public_access" {
   type    = bool
-  default = false
 }
