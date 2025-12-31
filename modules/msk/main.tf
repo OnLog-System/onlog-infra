@@ -50,9 +50,12 @@ resource "aws_msk_cluster" "this" {
         }
       }
 
-    connectivity_info {
-      public_access {
-        type = "SERVICE_PROVIDED_EIPS"
+    dynamic "connectivity_info" {
+      for_each = var.enable_msk_public_access ? [1] : []
+      content {
+        public_access {
+          type = "SERVICE_PROVIDED_EIPS"
+          }
         }
       }
     }

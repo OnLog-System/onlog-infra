@@ -210,5 +210,6 @@ module "msk" {
   security_group_ids   = [module.sg_msk.id]
   broker_instance_type = "kafka.t3.small"
   ebs_volume_size      = 10
+  enable_msk_public_access = var.enable_msk_public_access
   tags                 = var.tags
 }
