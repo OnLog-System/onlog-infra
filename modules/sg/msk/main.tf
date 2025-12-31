@@ -18,8 +18,5 @@ resource "aws_security_group" "msk" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = merge(
-    var.tags,
-    { Name = "${var.environment}-${var.name}-sg" }
-  )
+  tags = var.tags
 }
