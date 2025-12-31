@@ -40,3 +40,11 @@ output "sg_endpoints" {
   description = "VPC Endpoint Security Group ID"
   value       = module.sg_endpoints.id
 }
+
+############################################################
+# MSK
+############################################################
+output "msk_bootstrap_brokers_iam" {
+  description = "MSK IAM bootstrap brokers"
+  value       = module.msk.bootstrap_brokers_iam
+}
