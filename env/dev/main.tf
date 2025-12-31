@@ -180,3 +180,34 @@ module "nat_instance" {
   nat_az            = var.nat_az
   tags              = var.tags
 }
+
+############################################################
+# 11. SG: MSK
+############################################################
+module "sg_msk" {
+  source      = "../../modules/sg/msk"
+  name        = "msk"
+  environment = var.environment
+  vpc_id      = module.vpc.vpc_id
+
+  allowed_cidrs = ["0.0.0.0/0"] # 실험 단계
+
+  tags = var.tags
+}
+
+############################################################
+# 12. MSK Cluster
+############################################################
+module "msk" {
+  source      = "../../modules/msk"
+  name        = "msk"
+  environment = var.environment
+  kafka_version = "3.8.0"
+  availability_zones = var.availability_zones
+  brokers_per_az     = 1
+  subnet_ids = values(module.vpc.data_private_subnets_by_az)
+  security_group_ids = [module.sg_msk.id]
+  broker_instance_type = "kafka.t3.small"
+  ebs_volume_size      = 10
+  tags = var.tags
+}
