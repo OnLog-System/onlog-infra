@@ -33,3 +33,11 @@ output "app_private_subnets_by_az" {
     if lookup(s.tags, "subnet-type", "") == "app"
   }
 }
+
+output "data_private_subnets_by_az" {
+  value = {
+    for s in aws_subnet.private :
+    s.availability_zone => s.id
+    if lookup(s.tags, "subnet-type", "") == "data"
+  }
+}
