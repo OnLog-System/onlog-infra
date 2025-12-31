@@ -85,6 +85,5 @@ variable "nat_az" {
 
 variable "enable_msk" {
   type        = bool
-  description = "Enable MSK cluster"
-  default     = false
+  default     = true
 }
