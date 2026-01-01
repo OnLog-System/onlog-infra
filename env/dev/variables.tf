@@ -90,5 +90,5 @@ variable "enable_msk" {
 
 variable "enable_msk_public_access" {
   type    = bool
-  default = false
+  default = true
 }
