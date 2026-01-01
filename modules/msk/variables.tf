@@ -30,3 +30,7 @@ variable "brokers_per_az" {
   description = "AZ당 Kafka 브로커 수"
   default     = 1
 }
+
+variable "enable_msk_public_access" {
+  type    = bool
+}
