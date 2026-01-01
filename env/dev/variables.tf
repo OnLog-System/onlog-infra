@@ -85,10 +85,10 @@ variable "nat_az" {
 
 variable "enable_msk" {
   type    = bool
-  default = true
+  default = false
 }
 
 variable "enable_msk_public_access" {
   type    = bool
-  default = true
+  default = false
 }
