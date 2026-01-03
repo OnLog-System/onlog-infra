@@ -41,3 +41,53 @@ resource "aws_security_group_rule" "eice_to_node" {
   to_port                  = 22
   protocol                 = "tcp"
 }
+
+
+# Node → ALB (response traffic)
+resource "aws_security_group_rule" "node_to_alb" {
+  type                     = "egress"
+  security_group_id        = module.sg_node.id
+  source_security_group_id = module.sg_alb.id
+  from_port                = 30000
+  to_port                  = 32767
+  protocol                 = "tcp"
+}
+
+# Node → ControlPlane
+resource "aws_security_group_rule" "node_to_controlplane" {
+  type                     = "egress"
+  security_group_id        = module.sg_node.id
+  source_security_group_id = module.sg_controlplane.id
+  from_port                = 10250
+  to_port                  = 10250
+  protocol                 = "tcp"
+}
+
+# Endpoints → Node (response)
+resource "aws_security_group_rule" "endpoints_to_node" {
+  type                     = "ingress"
+  security_group_id        = module.sg_node.id
+  source_security_group_id = module.sg_endpoints.id
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+}
+
+
+resource "aws_security_group_rule" "node_self" {
+  type              = "ingress"
+  security_group_id = module.sg_node.id
+  self              = true
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "tcp"
+}
+
+resource "aws_security_group_rule" "node_self_egress" {
+  type              = "egress"
+  security_group_id = module.sg_node.id
+  self              = true
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "tcp"
+}
