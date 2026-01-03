@@ -74,3 +74,20 @@ resource "aws_security_group_rule" "endpoints_to_node" {
 }
 
 
+resource "aws_security_group_rule" "node_self" {
+  type              = "ingress"
+  security_group_id = module.sg_node.id
+  self              = true
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "tcp"
+}
+
+resource "aws_security_group_rule" "node_self_egress" {
+  type              = "egress"
+  security_group_id = module.sg_node.id
+  self              = true
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "tcp"
+}
