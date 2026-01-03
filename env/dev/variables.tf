@@ -92,3 +92,8 @@ variable "enable_msk_public_access" {
   type    = bool
   default = false
 }
+
+variable "enable_eks" {
+  type    = bool
+  default = true
+}
