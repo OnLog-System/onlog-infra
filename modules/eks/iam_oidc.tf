@@ -17,3 +17,13 @@ resource "aws_iam_openid_connect_provider" "eks" {
     aws_eks_cluster.this
   ]
 }
+
+data "aws_eks_cluster" "this" {
+  count = var.enable ? 1 : 0
+  name  = aws_eks_cluster.this[0].name
+}
+
+data "tls_certificate" "oidc" {
+  count = var.enable ? 1 : 0
+  url   = data.aws_eks_cluster.this[0].identity[0].oidc[0].issuer
+}
