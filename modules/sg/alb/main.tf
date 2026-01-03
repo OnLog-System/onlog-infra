@@ -20,14 +20,5 @@ resource "aws_security_group" "alb" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # Outbound: ALB → NodeGroup
-  egress {
-    description     = "ALB to NodeGroup"
-    from_port       = 0
-    to_port         = 65535
-    protocol        = "tcp"
-    security_groups = var.node_sg_ids
-  }
-
   tags = var.tags
 }
