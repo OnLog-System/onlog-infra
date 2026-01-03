@@ -213,3 +213,19 @@ module "msk" {
   enable_msk_public_access = var.enable_msk_public_access
   tags                     = var.tags
 }
+
+############################################################
+# 13. EKS Control Plane
+############################################################
+
+module "eks_control_plane" {
+  source = "../../modules/eks"
+  name = "eks"
+  environment              = var.environment
+  enable = var.enable_eks
+  cluster_version = "1.34"
+  vpc_id     = module.vpc.vpc_id
+  subnet_ids = module.vpc.private_subnet_ids
+  control_plane_sg_id = module.sg_controlplane.id
+  tags                     = var.tags
+}
