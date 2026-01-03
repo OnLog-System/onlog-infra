@@ -11,6 +11,8 @@ resource "aws_iam_role" "eks_cluster" {
       Action    = "sts:AssumeRole"
     }]
   })
+
+  tags = var.tags
 }
 
 resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
