@@ -25,93 +25,56 @@ module "vpc" {
 }
 
 ############################################################
-# 2. SG: NodeGroup (기본 SG 먼저 생성)
-############################################################
-
-module "sg_node_base" {
-  source = "../../modules/sg/nodegroup"
-
-  name        = "node-base"
-  vpc_id      = module.vpc.vpc_id
-  environment = var.environment
-
-  alb_sg_ids          = []
-  controlplane_sg_ids = []
-  endpoint_sg_ids     = []
-  eice_sg_ids         = []
-
-  tags = var.tags
-}
-
-############################################################
-# 3. SG: ALB
+# 2. SG: ALB
 ############################################################
 
 module "sg_alb" {
-  source = "../../modules/sg/alb"
-
+  source      = "../../modules/sg/alb"
   name        = "alb"
   vpc_id      = module.vpc.vpc_id
   environment = var.environment
-  node_sg_ids = [module.sg_node_base.id]
-
-  tags = var.tags
+  tags        = var.tags
 }
 
 ############################################################
-# 4. SG: Control Plane
+# 3. SG: Control Plane
 ############################################################
 
 module "sg_controlplane" {
-  source = "../../modules/sg/controlplane"
-
+  source      = "../../modules/sg/controlplane"
   name        = "controlplane"
   vpc_id      = module.vpc.vpc_id
   environment = var.environment
-
   admin_cidrs = var.admin_cidrs
-  node_sg_ids = [module.sg_node_base.id]
-
-  tags = var.tags
+  tags        = var.tags
 }
 
 ############################################################
-# 5. SG: Endpoints (SSM, ECR, Logs 등)
+# 4. SG: Endpoints (SSM, ECR, Logs 등)
 ############################################################
 
 module "sg_endpoints" {
-  source = "../../modules/sg/endpoints"
-
+  source      = "../../modules/sg/endpoints"
   name        = "endpoints"
   vpc_id      = module.vpc.vpc_id
   environment = var.environment
-
-  node_sg_ids = [module.sg_node_base.id]
-
-  tags = var.tags
+  tags        = var.tags
 }
 
 ############################################################
-# 6. SG: NodeGroup Final (다른 SG를 연결한 최종 구조)
+# 5. SG: NodeGroup
 ############################################################
 
 module "sg_node" {
-  source = "../../modules/sg/nodegroup"
-
+  source      = "../../modules/sg/nodegroup"
   name        = "node"
   vpc_id      = module.vpc.vpc_id
   environment = var.environment
-
-  alb_sg_ids          = [module.sg_alb.id]
-  controlplane_sg_ids = [module.sg_controlplane.id]
-  endpoint_sg_ids     = [module.sg_endpoints.id]
-  eice_sg_ids         = [module.sg_eice.id]
-
-  tags = var.tags
+  tags        = var.tags
 }
 
 ############################################################
-# 7. SG: EICE
+# 6. SG: EICE
 ############################################################
 
 module "sg_eice" {
@@ -123,7 +86,7 @@ module "sg_eice" {
 }
 
 ############################################################
-# 8. VPC Endpoints + EICE
+# 7. VPC Endpoints + EICE
 ############################################################
 
 module "endpoints" {
@@ -149,7 +112,7 @@ module "endpoints" {
 
 
 ############################################################
-# 9. SG: NAT
+# 8. SG: NAT
 ############################################################
 
 module "sg_nat" {
@@ -165,7 +128,7 @@ module "sg_nat" {
 
 
 ############################################################
-# 10. NAT Instance Module (ASG 기반)
+# 9. NAT Instance Module (ASG 기반)
 ############################################################
 
 module "nat_instance" {
@@ -182,7 +145,7 @@ module "nat_instance" {
 }
 
 ############################################################
-# 11. SG: MSK
+# 10. SG: MSK
 ############################################################
 module "sg_msk" {
   source      = "../../modules/sg/msk"
@@ -196,7 +159,7 @@ module "sg_msk" {
 }
 
 ############################################################
-# 12. MSK Cluster
+# 11. MSK Cluster
 ############################################################
 module "msk" {
   count                    = var.enable_msk ? 1 : 0
@@ -215,7 +178,7 @@ module "msk" {
 }
 
 ############################################################
-# 13. EKS Control Plane
+# 12. EKS Control Plane
 ############################################################
 
 module "eks_control_plane" {

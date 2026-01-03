@@ -9,11 +9,6 @@ variable "admin_cidrs" {
   type        = list(string)
 }
 
-variable "node_sg_ids" {
-  description = "NodeGroup SGs"
-  type        = list(string)
-}
-
 variable "tags" {
   type    = map(string)
   default = {}
