@@ -25,25 +25,6 @@ module "vpc" {
 }
 
 ############################################################
-# 2. SG: NodeGroup (기본 SG 먼저 생성)
-############################################################
-
-module "sg_node_base" {
-  source = "../../modules/sg/nodegroup"
-
-  name        = "node-base"
-  vpc_id      = module.vpc.vpc_id
-  environment = var.environment
-
-  alb_sg_ids          = []
-  controlplane_sg_ids = []
-  endpoint_sg_ids     = []
-  eice_sg_ids         = []
-
-  tags = var.tags
-}
-
-############################################################
 # 3. SG: ALB
 ############################################################
 
@@ -53,7 +34,7 @@ module "sg_alb" {
   name        = "alb"
   vpc_id      = module.vpc.vpc_id
   environment = var.environment
-  node_sg_ids = [module.sg_node_base.id]
+  node_sg_ids = [module.sg_node.id]
 
   tags = var.tags
 }
@@ -70,7 +51,7 @@ module "sg_controlplane" {
   environment = var.environment
 
   admin_cidrs = var.admin_cidrs
-  node_sg_ids = [module.sg_node_base.id]
+  node_sg_ids = [module.sg_node.id]
 
   tags = var.tags
 }
@@ -86,7 +67,7 @@ module "sg_endpoints" {
   vpc_id      = module.vpc.vpc_id
   environment = var.environment
 
-  node_sg_ids = [module.sg_node_base.id]
+  node_sg_ids = [module.sg_node.id]
 
   tags = var.tags
 }
