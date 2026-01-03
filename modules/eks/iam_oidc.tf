@@ -1,25 +1,19 @@
-data "aws_eks_cluster" "this" {
-  name = aws_eks_cluster.this[0].name
-}
-
-data "aws_eks_cluster_auth" "this" {
-  name = aws_eks_cluster.this[0].name
-}
-
 resource "aws_iam_openid_connect_provider" "eks" {
-  url = data.aws_eks_cluster.this.identity[0].oidc[0].issuer
+  count = var.enable ? 1 : 0
+
+  url = data.aws_eks_cluster.this[0].identity[0].oidc[0].issuer
 
   client_id_list = [
     "sts.amazonaws.com"
   ]
 
   thumbprint_list = [
-    data.tls_certificate.oidc.certificates[0].sha1_fingerprint
+    data.tls_certificate.oidc[0].certificates[0].sha1_fingerprint
   ]
 
   tags = var.tags
-}
 
-data "tls_certificate" "oidc" {
-  url = data.aws_eks_cluster.this.identity[0].oidc[0].issuer
+  depends_on = [
+    aws_eks_cluster.this
+  ]
 }
