@@ -29,11 +29,11 @@ module "vpc" {
 ############################################################
 
 module "sg_alb" {
-  source = "../../modules/sg/alb"
+  source      = "../../modules/sg/alb"
   name        = "alb"
   vpc_id      = module.vpc.vpc_id
   environment = var.environment
-  tags = var.tags
+  tags        = var.tags
 }
 
 ############################################################
@@ -41,12 +41,12 @@ module "sg_alb" {
 ############################################################
 
 module "sg_controlplane" {
-  source = "../../modules/sg/controlplane"
+  source      = "../../modules/sg/controlplane"
   name        = "controlplane"
   vpc_id      = module.vpc.vpc_id
   environment = var.environment
   admin_cidrs = var.admin_cidrs
-  tags = var.tags
+  tags        = var.tags
 }
 
 ############################################################
@@ -54,11 +54,11 @@ module "sg_controlplane" {
 ############################################################
 
 module "sg_endpoints" {
-  source = "../../modules/sg/endpoints"
+  source      = "../../modules/sg/endpoints"
   name        = "endpoints"
   vpc_id      = module.vpc.vpc_id
   environment = var.environment
-  tags = var.tags
+  tags        = var.tags
 }
 
 ############################################################
@@ -66,11 +66,11 @@ module "sg_endpoints" {
 ############################################################
 
 module "sg_node" {
-  source = "../../modules/sg/nodegroup"
+  source      = "../../modules/sg/nodegroup"
   name        = "node"
   vpc_id      = module.vpc.vpc_id
   environment = var.environment
-  tags = var.tags
+  tags        = var.tags
 }
 
 ############################################################
