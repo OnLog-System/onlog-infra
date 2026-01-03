@@ -7,10 +7,6 @@ variable "enable" {
   default = true
 }
 
-variable "name" {
-  type = string
-}
-
 variable "cluster_version" {
   type = string
 }
