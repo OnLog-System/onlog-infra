@@ -151,7 +151,7 @@ module "sg_msk" {
   name        = "msk"
   environment = var.environment
   vpc_id      = module.vpc.vpc_id
-  tags = var.tags
+  tags        = var.tags
 }
 
 ############################################################
