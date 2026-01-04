@@ -106,3 +106,24 @@ resource "aws_security_group_rule" "eice_to_node" {
 # 5. NodeGroup Internal Communication (Self-Reference)
 ############################################################
 
+# Node ↔ Node (Pod-to-Pod, Node-to-Node)
+resource "aws_security_group_rule" "node_self" {
+  type              = "ingress"
+  security_group_id = module.sg_node.id
+  self              = true
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "tcp"
+  description       = "Internal NodeGroup communication (ingress)"
+}
+
+# Node → Node (egress)
+resource "aws_security_group_rule" "node_self_egress" {
+  type              = "egress"
+  security_group_id = module.sg_node.id
+  self              = true
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "tcp"
+  description       = "Internal NodeGroup communication (egress)"
+}
