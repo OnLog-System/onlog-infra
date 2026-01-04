@@ -45,7 +45,6 @@ module "sg_controlplane" {
   name        = "controlplane"
   vpc_id      = module.vpc.vpc_id
   environment = var.environment
-  admin_cidrs = var.admin_cidrs
   tags        = var.tags
 }
 
@@ -152,10 +151,7 @@ module "sg_msk" {
   name        = "msk"
   environment = var.environment
   vpc_id      = module.vpc.vpc_id
-
-  allowed_cidrs = ["0.0.0.0/0"] # 실험 단계
-
-  tags = var.tags
+  tags        = var.tags
 }
 
 ############################################################

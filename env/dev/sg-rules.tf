@@ -58,6 +58,16 @@ resource "aws_security_group_rule" "node_to_controlplane" {
   description              = "NodeGroup communication to EKS Control Plane"
 }
 
+# Admin (kubectl) → ControlPlane
+resource "aws_security_group_rule" "admin_to_controlplane" {
+  type              = "ingress"
+  security_group_id = module.sg_controlplane.id
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = var.admin_cidrs
+  description       = "kubectl access to EKS control plane"
+}
 
 ############################################################
 # 3. VPC Interface Endpoints ↔ NodeGroup (AWS APIs)
@@ -126,4 +136,19 @@ resource "aws_security_group_rule" "node_self_egress" {
   to_port           = 65535
   protocol          = "tcp"
   description       = "Internal NodeGroup communication (egress)"
+}
+
+
+############################################################
+# 6. MSK (Kafka) Access
+############################################################
+
+resource "aws_security_group_rule" "node_to_msk" {
+  type                     = "ingress"
+  security_group_id        = module.sg_msk.id
+  source_security_group_id = module.sg_node.id
+  from_port                = 9098
+  to_port                  = 9098
+  protocol                 = "tcp"
+  description              = "EKS NodeGroup to MSK (IAM TLS)"
 }
