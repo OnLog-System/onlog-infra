@@ -3,14 +3,6 @@ resource "aws_security_group" "msk" {
   description = "MSK Broker SG"
   vpc_id      = var.vpc_id
 
-  ingress {
-    description = "Kafka IAM TLS"
-    from_port   = 9098
-    to_port     = 9098
-    protocol    = "tcp"
-    cidr_blocks = var.allowed_cidrs
-  }
-
   egress {
     from_port   = 0
     to_port     = 0
