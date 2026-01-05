@@ -79,6 +79,28 @@ variable "nat_az" {
   type = string
 }
 
+############################################################
+# EKS 관련 설정
+############################################################
+
+variable "nodegroups" {
+  type = map(object({
+    instance_type    = string
+    root_volume_size = number
+    desired_size     = number
+    min_size         = number
+    max_size         = number
+    capacity_type    = optional(string, "ON_DEMAND")
+    labels           = optional(map(string), {})
+    taints           = optional(list(object({
+      key    = string
+      value  = string
+      effect = string
+    })), [])
+  }))
+}
+
+
 #############################################################
 # Enable 관리
 #############################################################
@@ -97,3 +119,4 @@ variable "enable_eks" {
   type    = bool
   default = true
 }
+
