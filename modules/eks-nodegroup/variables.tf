@@ -1,10 +1,6 @@
+variable "enable" {}
 variable "name" {}
 variable "environment" {}
-
-variable "enable" {
-  type    = bool
-  default = true
-}
 
 variable "cluster_name" {}
 variable "node_role_arn" {}
@@ -17,28 +13,18 @@ variable "node_sg_ids" {
   type = list(string)
 }
 
-variable "instance_type" {
-  default = "t4g.small"
-}
+variable "instance_type" {}
+variable "root_volume_size" {}
 
-variable "root_volume_size" {
-  default = 20
-}
+variable "desired_size" {}
+variable "min_size" {}
+variable "max_size" {}
 
-variable "desired_size" {
-  default = 2
-}
+variable "capacity_type" {}
 
-variable "min_size" {
-  default = 1
-}
-
-variable "max_size" {
-  default = 3
-}
-
-variable "capacity_type" {
-  default = "ON_DEMAND"
+variable "labels" {
+  type    = map(string)
+  default = {}
 }
 
 variable "tags" {
