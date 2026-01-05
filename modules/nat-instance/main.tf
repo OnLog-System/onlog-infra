@@ -57,16 +57,29 @@ resource "aws_launch_template" "nat" {
 
   user_data = base64encode(<<EOF
 #!/bin/bash
+set -e
+
 yum install -y iptables-services
 
 systemctl enable iptables
 systemctl start iptables
 
-echo 'net.ipv4.ip_forward = 1' > /etc/sysctl.d/ipforward.conf
-sysctl -p /etc/sysctl.d/ipforward.conf
+# IP Forwarding 활성화
+cat <<SYSCTL >/etc/sysctl.d/99-nat.conf
+net.ipv4.ip_forward = 1
+SYSCTL
+sysctl --system
 
-iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-iptables -F FORWARD
+# 외부 인터페이스 자동 탐지
+IFACE=$(ip route get 8.8.8.8 | awk '{print $5; exit}')
+
+# NAT (SNAT)
+iptables -t nat -A POSTROUTING -o $IFACE -j MASQUERADE
+
+# Forward 허용
+iptables -A FORWARD -i $IFACE -j ACCEPT
+iptables -A FORWARD -o $IFACE -j ACCEPT
+
 service iptables save
 EOF
   )
