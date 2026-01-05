@@ -19,17 +19,9 @@ resource "aws_launch_template" "this" {
   }
 
   user_data = base64encode(<<-EOF
-  MIME-Version: 1.0
-  Content-Type: multipart/mixed; boundary="==BOUNDARY=="
-
-  --==BOUNDARY==
-  Content-Type: text/x-shellscript; charset="us-ascii"
-
   #!/bin/bash
   set -o xtrace
   /etc/eks/bootstrap.sh ${var.cluster_name}
-
-  --==BOUNDARY==--
   EOF
   )
 
