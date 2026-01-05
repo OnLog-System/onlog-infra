@@ -48,3 +48,12 @@ output "msk_bootstrap_brokers_iam" {
   description = "MSK IAM bootstrap brokers"
   value       = var.enable_msk ? module.msk[0].bootstrap_brokers_iam : null
 }
+
+
+############################################################
+# Admin Bastion
+############################################################
+output "admin_bastion_private_ip" {
+  description = "Admin Bastion Instance Private IP"
+  value       = module.admin_bastion.private_ip
+}
