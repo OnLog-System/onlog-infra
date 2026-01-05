@@ -18,7 +18,7 @@ resource "aws_instance" "this" {
 
   user_data = <<EOF
 #!/bin/bash
-dnf install -y tailscale
+curl -fsSL https://tailscale.com/install.sh | sh
 systemctl enable --now tailscaled
 
 echo "net.ipv4.ip_forward=1" > /etc/sysctl.d/99-tailscale.conf
