@@ -18,7 +18,6 @@ resource "aws_launch_template" "this" {
     }
   }
 
-  # ⚠️ 필수: EKS bootstrap
   user_data = base64encode(<<-EOF
     #!/bin/bash
     /etc/eks/bootstrap.sh ${var.cluster_name}
@@ -31,7 +30,10 @@ resource "aws_launch_template" "this" {
 
   tag_specifications {
     resource_type = "instance"
-    tags = var.tags
+    tags = merge(
+      var.tags,
+      { Name = "${var.environment}-${var.name}-node" }
+    )
   }
 
   tags = var.tags
