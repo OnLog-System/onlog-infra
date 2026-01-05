@@ -190,29 +190,34 @@ module "eks_control_plane" {
 }
 
 ############################################################
-# 13. EKS Node Group
+# 13. EKS Node Groups (core / batch)
 ############################################################
 
-# module "eks_nodegroup" {
-#   source = "../../modules/eks-nodegroup"
-#   enable = var.enable_eks
-#   name        = "core"
-#   environment = var.environment
+module "eks_nodegroups" {
+  for_each = var.enable_eks ? var.nodegroups : {}
 
-#   cluster_name   = module.eks_control_plane.cluster_name
-#   node_role_arn = module.eks_control_plane.node_role_arn
+  source = "../../modules/eks-nodegroup"
 
-#   subnet_ids  = module.vpc.private_subnet_ids
-#   node_sg_ids = [module.sg_node.id]
+  name        = each.key
+  environment = var.environment
+  enable      = true
 
-#   instance_type    = "t4g.medium"
-#   root_volume_size = 20
+  cluster_name   = module.eks_control_plane.cluster_name
+  node_role_arn = module.eks_control_plane.node_role_arn
 
-#   desired_size = 2
-#   min_size     = 1
-#   max_size     = 3
+  subnet_ids  = module.vpc.private_subnet_ids
+  node_sg_ids = [module.sg_node.id]
 
-#   tags = var.tags
-# }
+  instance_type    = each.value.instance_type
+  root_volume_size = each.value.root_volume_size
 
-# # batch 도 이어서 생성
+  desired_size = each.value.desired_size
+  min_size     = each.value.min_size
+  max_size     = each.value.max_size
+
+  capacity_type = each.value.capacity_type
+  labels        = each.value.labels
+  taints        = each.value.taints
+
+  tags = var.tags
+}
