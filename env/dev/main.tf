@@ -237,5 +237,6 @@ module "admin_bastion" {
   subnet_id         = values(module.vpc.app_private_subnets_by_az)[0]
   security_group_id = module.sg_admin_bastion.id
   key_name          = aws_key_pair.admin_bastion.key_name
+  tailscale_auth_key = var.tailscale_auth_key
   tags              = var.tags
 }
