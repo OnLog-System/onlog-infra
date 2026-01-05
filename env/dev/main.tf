@@ -202,7 +202,7 @@ module "eks_nodegroups" {
   environment = var.environment
   enable      = true
 
-  cluster_name   = module.eks_control_plane.cluster_name
+  cluster_name  = module.eks_control_plane.cluster_name
   node_role_arn = module.eks_control_plane.node_role_arn
 
   subnet_ids  = module.vpc.private_subnet_ids

@@ -92,7 +92,7 @@ variable "nodegroups" {
     max_size         = number
     capacity_type    = optional(string, "ON_DEMAND")
     labels           = optional(map(string), {})
-    taints           = optional(list(object({
+    taints = optional(list(object({
       key    = string
       value  = string
       effect = string
