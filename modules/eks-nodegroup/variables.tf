@@ -27,15 +27,6 @@ variable "labels" {
   default = {}
 }
 
-variable "taints" {
-  type    = list(object({
-    key    = string
-    value  = string
-    effect = string
-  }))
-  default = []
-}
-
 variable "tags" {
   type = map(string)
 }
