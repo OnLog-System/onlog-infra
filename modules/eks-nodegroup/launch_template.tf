@@ -18,13 +18,6 @@ resource "aws_launch_template" "this" {
     }
   }
 
-  user_data = base64encode(<<-EOF
-  #!/bin/bash
-  set -o xtrace
-  /etc/eks/bootstrap.sh ${var.cluster_name}
-  EOF
-  )
-
   metadata_options {
     http_tokens = "required"
   }
