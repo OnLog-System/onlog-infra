@@ -188,3 +188,31 @@ module "eks_control_plane" {
   control_plane_sg_id = module.sg_controlplane.id
   tags                = var.tags
 }
+
+############################################################
+# 13. EKS Node Group
+############################################################
+
+# module "eks_nodegroup" {
+#   source = "../../modules/eks-nodegroup"
+#   enable = var.enable_eks
+#   name        = "core"
+#   environment = var.environment
+
+#   cluster_name   = module.eks_control_plane.cluster_name
+#   node_role_arn = module.eks_control_plane.node_role_arn
+
+#   subnet_ids  = module.vpc.private_subnet_ids
+#   node_sg_ids = [module.sg_node.id]
+
+#   instance_type    = "t4g.medium"
+#   root_volume_size = 20
+
+#   desired_size = 2
+#   min_size     = 1
+#   max_size     = 3
+
+#   tags = var.tags
+# }
+
+# # batch 도 이어서 생성

@@ -85,7 +85,7 @@ variable "nat_az" {
 
 variable "enable_msk" {
   type    = bool
-  default = false
+  default = true
 }
 
 variable "enable_msk_public_access" {
@@ -95,5 +95,5 @@ variable "enable_msk_public_access" {
 
 variable "enable_eks" {
   type    = bool
-  default = false
+  default = true
 }
