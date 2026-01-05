@@ -212,3 +212,26 @@ module "eks_nodegroups" {
   labels           = each.value.labels
   tags             = var.tags
 }
+
+############################################################
+# 14. SG: Admin Bastion 
+############################################################
+
+module "sg_admin_bastion" {
+  source      = "../../modules/sg/admin-bastion"
+  name                = "admin-bastion"
+  environment         = var.environment
+  vpc_id      = module.vpc.vpc_id
+  tags        = var.tags
+}
+
+
+module "admin_bastion" {
+  source = "../../modules/admin-bastion"
+  name                = "admin-bastion"
+  environment       = var.environment
+  instance_type     = "t4g.nano"
+  subnet_id         = values(module.vpc.app_private_subnets_by_az)[0]
+  security_group_id = module.sg_admin_bastion.id
+  tags = var.tags
+}
