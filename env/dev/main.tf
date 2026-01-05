@@ -219,19 +219,19 @@ module "eks_nodegroups" {
 
 module "sg_admin_bastion" {
   source      = "../../modules/sg/admin-bastion"
-  name                = "admin-bastion"
-  environment         = var.environment
+  name        = "admin-bastion"
+  environment = var.environment
   vpc_id      = module.vpc.vpc_id
   tags        = var.tags
 }
 
 
 module "admin_bastion" {
-  source = "../../modules/admin-bastion"
-  name                = "admin-bastion"
+  source            = "../../modules/admin-bastion"
+  name              = "admin-bastion"
   environment       = var.environment
   instance_type     = "t4g.nano"
   subnet_id         = values(module.vpc.app_private_subnets_by_az)[0]
   security_group_id = module.sg_admin_bastion.id
-  tags = var.tags
+  tags              = var.tags
 }
