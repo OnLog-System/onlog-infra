@@ -153,14 +153,3 @@ resource "aws_security_group_rule" "node_to_msk" {
   protocol                 = "tcp"
   description              = "EKS NodeGroup to MSK (IAM TLS)"
 }
-
-# MSK → Node (response traffic)
-resource "aws_security_group_rule" "msk_to_node" {
-  type                     = "egress"
-  security_group_id        = module.sg_msk.id
-  source_security_group_id = module.sg_node.id
-  from_port                = 9098
-  to_port                  = 9098
-  protocol                 = "tcp"
-  description              = "MSK response traffic to EKS NodeGroup"
-}
