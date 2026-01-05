@@ -20,9 +20,7 @@ variable "desired_size" {}
 variable "min_size" {}
 variable "max_size" {}
 
-variable "capacity_type" {
-  default = "ON_DEMAND"
-}
+variable "capacity_type" {}
 
 variable "labels" {
   type    = map(string)
