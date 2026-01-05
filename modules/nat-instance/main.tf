@@ -49,6 +49,7 @@ resource "aws_launch_template" "nat" {
   name_prefix   = "${var.environment}-nat-"
   image_id      = data.aws_ami.al2023.id
   instance_type = var.instance_type
+  update_default_version = true
 
   network_interfaces {
     network_interface_id = aws_network_interface.nat.id
