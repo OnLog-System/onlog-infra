@@ -18,7 +18,7 @@ resource "aws_eks_node_group" "this" {
   }
 
   capacity_type = var.capacity_type
-  ami_type      = "AL2_ARM_64"
+  ami_type      = "AL2023_ARM_64"
 
   update_config {
     max_unavailable = 1
