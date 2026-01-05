@@ -103,6 +103,11 @@ variable "admin_bastion_public_key_yoonseok" {
   type = string
 }
 
+variable "tailscale_auth_key" {
+  type      = string
+  sensitive = true
+}
+
 #############################################################
 # Enable 관리
 #############################################################

@@ -12,3 +12,8 @@ variable "key_name" {
   type        = string
   description = "SSH key pair name for admin bastion"
 }
+
+variable "tailscale_auth_key" {
+  type      = string
+  sensitive = true
+}
