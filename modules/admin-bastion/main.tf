@@ -24,6 +24,12 @@ systemctl enable --now tailscaled
 
 echo "net.ipv4.ip_forward=1" > /etc/sysctl.d/99-tailscale.conf
 sysctl --system
+
+tailscale up \
+  --authkey=${var.tailscale_auth_key} \
+  --advertise-routes=10.0.0.0/16 \
+  --hostname=dev-admin-bastion \
+  --accept-routes=false
 EOF
 
   tags = merge(
