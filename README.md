@@ -103,6 +103,9 @@ Terraform state는 AWS에 저장됩니다.
 ```
 aws s3 cp env/dev/terraform.tfvars s3://onlog-tfvars-config/dev.tfvars
 ```
+```
+aws s3 cp terraform.tfvars s3://onlog-tfvars-config/dev.tfvars
+```
 
 ### GitHub Actions에서는 항상 S3에서 다운로드하여 실행
 
