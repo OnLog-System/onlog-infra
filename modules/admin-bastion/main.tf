@@ -51,6 +51,7 @@ EOS
 
 systemctl daemon-reload
 systemctl enable tailscale-autoup
+sudo systemctl start tailscale-autoup
 EOF
 
   tags = merge(
