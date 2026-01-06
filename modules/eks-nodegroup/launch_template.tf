@@ -8,18 +8,19 @@ resource "aws_launch_template" "this" {
   vpc_security_group_ids = var.node_sg_ids
 
   user_data = base64encode(<<EOF
-MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="==MYBOUNDARY=="
+  MIME-Version: 1.0
+  Content-Type: multipart/mixed; boundary="==MYBOUNDARY=="
 
---==MYBOUNDARY==
-Content-Type: text/x-shellscript; charset="us-ascii"
+  --==MYBOUNDARY==
+  Content-Type: text/x-shellscript; charset="us-ascii"
+  Content-Transfer-Encoding: 7bit
 
-#!/bin/bash
-set -o xtrace
-/etc/eks/bootstrap.sh ${var.cluster_name}
+  #!/bin/bash
+  set -o xtrace
+  /etc/eks/bootstrap.sh ${var.cluster_name}
 
---==MYBOUNDARY==--
-EOF
+  --==MYBOUNDARY==--
+  EOF
   )
 
   block_device_mappings {
