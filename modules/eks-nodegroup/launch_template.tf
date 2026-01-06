@@ -7,6 +7,14 @@ resource "aws_launch_template" "this" {
   instance_type = var.instance_type
   vpc_security_group_ids = var.node_sg_ids
 
+  user_data = base64encode(<<EOF
+  #!/bin/bash
+  set -o xtrace
+  /etc/eks/bootstrap.sh ${var.cluster_name}
+  EOF
+  )
+
+
   block_device_mappings {
     device_name = "/dev/xvda"
     ebs {
