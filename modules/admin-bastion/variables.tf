@@ -17,3 +17,8 @@ variable "tailscale_auth_key" {
   type      = string
   sensitive = true
 }
+
+variable "eice_ssh_policy_arn" {
+  type        = string
+  description = "IAM policy ARN for EC2 Instance Connect SSH receive"
+}

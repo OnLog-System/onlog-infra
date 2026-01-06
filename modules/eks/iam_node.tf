@@ -37,3 +37,13 @@ resource "aws_iam_role_policy_attachment" "node_ecr" {
   role       = aws_iam_role.eks_node[0].name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
 }
+
+############################################
+# EICE SSH access for EKS nodes
+############################################
+
+resource "aws_iam_role_policy_attachment" "node_eice_ssh" {
+  count      = var.enable ? 1 : 0
+  role       = aws_iam_role.eks_node[0].name
+  policy_arn = var.eice_ssh_policy_arn
+}
