@@ -186,6 +186,7 @@ module "eks_control_plane" {
   vpc_id              = module.vpc.vpc_id
   subnet_ids          = module.vpc.private_subnet_ids
   control_plane_sg_id = module.sg_controlplane.id
+  eice_ssh_policy_arn = aws_iam_policy.eice_ssh_receive.arn
   tags                = var.tags
 }
 
@@ -238,5 +239,6 @@ module "admin_bastion" {
   security_group_id  = module.sg_admin_bastion.id
   key_name           = aws_key_pair.admin_bastion_labpc.key_name
   tailscale_auth_key = var.tailscale_auth_key
+  eice_ssh_policy_arn = aws_iam_policy.eice_ssh_receive.arn
   tags               = var.tags
 }
