@@ -116,18 +116,6 @@ variable "tailscale_auth_key" {
   sensitive = true
 }
 
-############################################################
-# EKS - aws-auth
-############################################################
-
-variable "admin_role_arn" {
-  description = "Terraform / kubectl admin IAM Role ARN"
-  type        = string
-}
-
-
-
-
 
 
 
