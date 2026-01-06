@@ -44,6 +44,7 @@ resource "aws_security_group_rule" "cluster_sg_to_node_kubelet" {
   from_port                = 10250
   to_port                  = 10250
   protocol                 = "tcp"
+  description              = "EKS Control Plane to NodeGroup kubelet"
 }
 
 # ControlPlane → Node (API)
@@ -54,6 +55,7 @@ resource "aws_security_group_rule" "cluster_sg_to_node_api" {
   from_port                = 443
   to_port                  = 443
   protocol                 = "tcp"
+  description              = "EKS Control Plane to NodeGroup API"
 }
 
 # Node → ControlPlane
@@ -64,6 +66,7 @@ resource "aws_security_group_rule" "node_to_cluster_sg" {
   from_port                = 443
   to_port                  = 443
   protocol                 = "tcp"
+  description              = "NodeGroup to EKS Control Plane"
 }
 
 ############################################################
