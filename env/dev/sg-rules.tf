@@ -36,37 +36,34 @@ resource "aws_security_group_rule" "node_to_alb" {
 # 2. Control Plane ↔ NodeGroup (Kubernetes Control)
 ############################################################
 
-# ControlPlane → Node (kubelet / health checks)
-resource "aws_security_group_rule" "controlplane_to_node" {
+# ControlPlane → Node (kubelet)
+resource "aws_security_group_rule" "cluster_sg_to_node_kubelet" {
   type                     = "ingress"
   security_group_id        = module.sg_node.id
-  source_security_group_id = module.sg_controlplane.id
+  source_security_group_id = module.eks_control_plane.cluster_security_group_id
   from_port                = 10250
   to_port                  = 10250
   protocol                 = "tcp"
-  description              = "EKS Control Plane to kubelet on NodeGroup"
 }
 
-# Node → ControlPlane
-resource "aws_security_group_rule" "node_to_controlplane" {
-  type                     = "egress"
+# ControlPlane → Node (API)
+resource "aws_security_group_rule" "cluster_sg_to_node_api" {
+  type                     = "ingress"
   security_group_id        = module.sg_node.id
-  source_security_group_id = module.sg_controlplane.id
+  source_security_group_id = module.eks_control_plane.cluster_security_group_id
   from_port                = 443
   to_port                  = 443
   protocol                 = "tcp"
-  description              = "NodeGroup communication to EKS Control Plane"
 }
 
-# Admin (kubectl) → ControlPlane
-resource "aws_security_group_rule" "admin_to_controlplane" {
-  type              = "ingress"
-  security_group_id = module.sg_controlplane.id
-  from_port         = 443
-  to_port           = 443
-  protocol          = "tcp"
-  cidr_blocks       = var.admin_cidrs
-  description       = "kubectl access to EKS control plane"
+# Node → ControlPlane
+resource "aws_security_group_rule" "node_to_cluster_sg" {
+  type                     = "egress"
+  security_group_id        = module.sg_node.id
+  source_security_group_id = module.eks_control_plane.cluster_security_group_id
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
 }
 
 ############################################################
@@ -167,3 +164,5 @@ resource "aws_security_group_rule" "node_to_internet" {
   cidr_blocks       = ["0.0.0.0/0"]
   description       = "NodeGroup outbound internet access via NAT"
 }
+
+
