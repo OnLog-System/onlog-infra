@@ -21,3 +21,7 @@ output "oidc_provider_arn" {
 output "node_role_arn" {
   value = var.enable ? aws_iam_role.eks_node[0].arn : null
 }
+
+output "cluster_security_group_id" {
+  value = var.enable ? aws_eks_cluster.this[0].vpc_config[0].cluster_security_group_id : null
+}
