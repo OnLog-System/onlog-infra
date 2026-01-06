@@ -19,17 +19,38 @@ resource "aws_instance" "this" {
 
   user_data = <<EOF
 #!/bin/bash
+set -e
+
 curl -fsSL https://tailscale.com/install.sh | sh
 systemctl enable --now tailscaled
 
 echo "net.ipv4.ip_forward=1" > /etc/sysctl.d/99-tailscale.conf
 sysctl --system
 
-tailscale up \
-  --authkey=${var.tailscale_auth_key} \
-  --advertise-routes=10.0.0.0/16 \
-  --hostname=dev-admin-bastion \
-  --accept-routes=false
+cat <<'EOS' > /etc/systemd/system/tailscale-autoup.service
+[Unit]
+Description=Tailscale auto up
+After=network-online.target tailscaled.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -c '\
+  /usr/bin/tailscale status >/dev/null 2>&1 || \
+  /usr/bin/tailscale up \
+    --authkey=${var.tailscale_auth_key} \
+    --advertise-routes=10.0.0.0/16 \
+    --hostname=dev-admin-bastion \
+    --accept-routes=false \
+'
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+EOS
+
+systemctl daemon-reload
+systemctl enable tailscale-autoup
 EOF
 
   tags = merge(
