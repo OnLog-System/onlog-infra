@@ -153,3 +153,17 @@ resource "aws_security_group_rule" "node_to_msk" {
   protocol                 = "tcp"
   description              = "EKS NodeGroup to MSK (IAM TLS)"
 }
+
+############################################################
+# 7. NodeGroup → Internet (NAT via Private Subnet)
+############################################################
+
+resource "aws_security_group_rule" "node_to_internet" {
+  type              = "egress"
+  security_group_id = module.sg_node.id
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "NodeGroup outbound internet access via NAT"
+}
