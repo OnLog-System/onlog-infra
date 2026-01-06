@@ -99,9 +99,17 @@ variable "nodegroups" {
 # Admin Bastion Key Pair
 ############################################################
 
-variable "admin_bastion_public_key_yoonseok" {
+variable "admin_bastion_public_key_yoonseok_labpc" {
   type = string
 }
+
+variable "admin_bastion_public_key_yoonseok_notepc" {
+  type = string
+}
+
+############################################################
+# Tailscale
+############################################################
 
 variable "tailscale_auth_key" {
   type      = string
@@ -126,4 +134,5 @@ variable "enable_eks" {
   type    = bool
   default = true
 }
+
 
