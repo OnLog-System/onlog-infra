@@ -19,10 +19,6 @@ variable "subnet_ids" {
   type = list(string)
 }
 
-variable "control_plane_sg_id" {
-  type = string
-}
-
 variable "eice_ssh_policy_arn" {
   description = "IAM policy ARN for EICE SSH receive"
   type        = string
