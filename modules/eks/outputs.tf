@@ -6,6 +6,10 @@ output "cluster_endpoint" {
   value = var.enable ? aws_eks_cluster.this[0].endpoint : null
 }
 
+output "cluster_ca" {
+  value = var.enable ? aws_eks_cluster.this[0].certificate_authority[0].data : null
+}
+
 output "cluster_arn" {
   value = var.enable ? aws_eks_cluster.this[0].arn : null
 }
