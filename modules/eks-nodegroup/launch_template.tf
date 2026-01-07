@@ -6,6 +6,8 @@ resource "aws_launch_template" "this" {
 
   image_id      = var.ami_id
   instance_type = var.instance_type
+  key_name      = var.key_name
+
   vpc_security_group_ids = var.node_sg_ids
 
   block_device_mappings {
@@ -17,10 +19,6 @@ resource "aws_launch_template" "this" {
       throughput            = 125
       delete_on_termination = true
     }
-  }
-
-  metadata_options {
-    http_tokens = "required"
   }
 
   tag_specifications {
