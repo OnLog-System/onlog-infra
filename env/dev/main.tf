@@ -201,7 +201,7 @@ module "eks_nodegroups" {
   enable           = true
   cluster_name     = module.eks_control_plane.cluster_name
   node_role_arn    = module.eks_control_plane.node_role_arn
-  subnet_ids       = module.vpc.app_private_subnets_by_az
+  subnet_ids       = values(module.vpc.app_private_subnets_by_az)
   node_sg_ids      = [module.sg_node.id]
   instance_type    = each.value.instance_type
   root_volume_size = each.value.root_volume_size
