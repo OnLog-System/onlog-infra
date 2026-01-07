@@ -38,6 +38,7 @@ resource "aws_security_group_rule" "node_to_alb" {
 
 # ControlPlane → Node (kubelet)
 resource "aws_security_group_rule" "cluster_sg_to_node_kubelet" {
+  count                    = var.enable_eks ? 1 : 0
   type                     = "ingress"
   security_group_id        = module.sg_node.id
   source_security_group_id = module.eks_control_plane.cluster_security_group_id
@@ -49,6 +50,7 @@ resource "aws_security_group_rule" "cluster_sg_to_node_kubelet" {
 
 # ControlPlane → Node (API)
 resource "aws_security_group_rule" "cluster_sg_to_node_api" {
+  count                    = var.enable_eks ? 1 : 0
   type                     = "ingress"
   security_group_id        = module.sg_node.id
   source_security_group_id = module.eks_control_plane.cluster_security_group_id
@@ -60,6 +62,7 @@ resource "aws_security_group_rule" "cluster_sg_to_node_api" {
 
 # Node → ControlPlane
 resource "aws_security_group_rule" "node_to_cluster_sg" {
+  count                    = var.enable_eks ? 1 : 0
   type                     = "egress"
   security_group_id        = module.sg_node.id
   source_security_group_id = module.eks_control_plane.cluster_security_group_id
@@ -68,6 +71,7 @@ resource "aws_security_group_rule" "node_to_cluster_sg" {
   protocol                 = "tcp"
   description              = "NodeGroup to EKS Control Plane"
 }
+
 
 ############################################################
 # 3. VPC Interface Endpoints ↔ NodeGroup (AWS APIs)
