@@ -25,3 +25,12 @@ resource "aws_iam_role_policy_attachment" "eice_ssh" {
 resource "aws_iam_instance_profile" "this" {
   role = aws_iam_role.this.name
 }
+
+############################################
+# EKS Admin Access for Bastion
+############################################
+
+resource "aws_iam_role_policy_attachment" "eks_admin" {
+  role       = aws_iam_role.this.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterAdminPolicy"
+}
