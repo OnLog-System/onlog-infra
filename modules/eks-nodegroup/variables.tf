@@ -32,6 +32,11 @@ variable "labels" {
   default = {}
 }
 
+variable "key_name" {
+  type        = string
+  description = "EC2 key pair name for SSH access"
+}
+
 variable "tags" {
   type = map(string)
 }

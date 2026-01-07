@@ -211,6 +211,7 @@ module "eks_nodegroups" {
   capacity_type    = each.value.capacity_type
   labels           = each.value.labels
   ami_id           = data.aws_ssm_parameter.eks_ami.value
+  key_name         = "dev-admin-bastion-labpc"
   tags             = var.tags
 }
 
