@@ -27,10 +27,10 @@ resource "aws_iam_instance_profile" "this" {
 }
 
 ############################################
-# EKS Admin Access for Bastion
+# EKS ReadOnly Access for Admin Bastion
 ############################################
 
-resource "aws_iam_role_policy_attachment" "eks_admin" {
+resource "aws_iam_role_policy_attachment" "eks_readonly" {
   role       = aws_iam_role.this.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterAdminPolicy"
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSReadOnlyAccess"
 }
