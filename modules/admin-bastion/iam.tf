@@ -27,6 +27,11 @@ resource "aws_iam_instance_profile" "this" {
 }
 
 ############################################
+# Data
+############################################
+data "aws_caller_identity" "current" {}
+
+############################################
 # EKS DescribeCluster access for Admin Bastion
 ############################################
 
