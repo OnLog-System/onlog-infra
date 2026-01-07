@@ -96,7 +96,7 @@ module "endpoints" {
   vpc_id      = module.vpc.vpc_id
 
   # Interface Endpoints Subnets: automatically select one representative private subnet per AZ
-  endpoint_subnet_ids = module.vpc.private_subnet_ids
+  endpoint_subnet_ids = values(module.vpc.app_private_subnets_by_az)
 
   endpoint_sg_id = module.sg_endpoints.id
   eice_sg_id     = module.sg_eice.id
@@ -193,25 +193,25 @@ module "eks_control_plane" {
 # 13. EKS Node Groups (core / batch)
 ############################################################
 
-# module "eks_nodegroups" {
-#   for_each         = var.enable_eks ? var.nodegroups : {}
-#   source           = "../../modules/eks-nodegroup"
-#   name             = each.key
-#   environment      = var.environment
-#   enable           = true
-#   cluster_name     = module.eks_control_plane.cluster_name
-#   node_role_arn    = module.eks_control_plane.node_role_arn
-#   subnet_ids       = module.vpc.private_subnet_ids
-#   node_sg_ids      = [module.sg_node.id]
-#   instance_type    = each.value.instance_type
-#   root_volume_size = each.value.root_volume_size
-#   desired_size     = each.value.desired_size
-#   min_size         = each.value.min_size
-#   max_size         = each.value.max_size
-#   capacity_type    = each.value.capacity_type
-#   labels           = each.value.labels
-#   tags             = var.tags
-# }
+module "eks_nodegroups" {
+  for_each         = var.enable_eks ? var.nodegroups : {}
+  source           = "../../modules/eks-nodegroup"
+  name             = each.key
+  environment      = var.environment
+  enable           = true
+  cluster_name     = module.eks_control_plane.cluster_name
+  node_role_arn    = module.eks_control_plane.node_role_arn
+  subnet_ids       = values(module.vpc.app_private_subnets_by_az)
+  node_sg_ids      = [module.sg_node.id]
+  instance_type    = each.value.instance_type
+  root_volume_size = each.value.root_volume_size
+  desired_size     = each.value.desired_size
+  min_size         = each.value.min_size
+  max_size         = each.value.max_size
+  capacity_type    = each.value.capacity_type
+  labels           = each.value.labels
+  tags             = var.tags
+}
 
 ############################################################
 # 14. SG: Admin Bastion 
