@@ -210,6 +210,7 @@ module "eks_nodegroups" {
   max_size         = each.value.max_size
   capacity_type    = each.value.capacity_type
   labels           = each.value.labels
+  ami_id           = data.aws_ssm_parameter.eks_ami.value
   tags             = var.tags
 }
 

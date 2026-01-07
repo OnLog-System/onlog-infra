@@ -14,6 +14,11 @@ variable "node_sg_ids" {
 }
 
 variable "instance_type" {}
+
+variable "ami_id" {
+  type = string
+  description = "EKS Optimized AL2023 ARM64 AMI ID"
+}
 variable "root_volume_size" {}
 
 variable "desired_size" {}
