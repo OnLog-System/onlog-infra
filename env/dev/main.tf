@@ -96,7 +96,7 @@ module "endpoints" {
   vpc_id      = module.vpc.vpc_id
 
   # Interface Endpoints Subnets: automatically select one representative private subnet per AZ
-  endpoint_subnet_ids = values(module.vpc.app_private_subnets_by_az)
+  endpoint_subnet_ids = module.vpc.private_subnet_ids
 
   endpoint_sg_id = module.sg_endpoints.id
   eice_sg_id     = module.sg_eice.id
