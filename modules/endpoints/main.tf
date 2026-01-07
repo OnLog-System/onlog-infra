@@ -43,6 +43,7 @@ locals {
     # ec2messages  = "com.amazonaws.${var.region}.ec2messages"
     ecr_api      = "com.amazonaws.${var.region}.ecr.api"
     ecr_docker   = "com.amazonaws.${var.region}.ecr.dkr"
+    sts          = "com.amazonaws.${var.region}.sts"
   }
 }
 
