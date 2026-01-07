@@ -4,6 +4,7 @@ resource "aws_launch_template" "this" {
   name_prefix = "${var.environment}-${var.name}-lt-"
   update_default_version = true
 
+  image_id      = var.ami_id
   instance_type = var.instance_type
   vpc_security_group_ids = var.node_sg_ids
 
