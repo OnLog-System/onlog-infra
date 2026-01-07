@@ -206,3 +206,18 @@ resource "aws_security_group_rule" "endpoints_from_vpc_cidr_https" {
   cidr_blocks       = [var.vpc_cidr]
   description       = "EKS bootstrap / aws-vpc-cni-init access from VPC CIDR"
 }
+
+############################################################
+# 9. Admin Bastion → EKS Control Plane (kubectl)
+############################################################
+
+resource "aws_security_group_rule" "bastion_to_cluster_sg" {
+  count                    = var.enable_eks ? 1 : 0
+  type                     = "ingress"
+  security_group_id        = module.eks_control_plane.cluster_security_group_id
+  source_security_group_id = module.sg_admin_bastion.id
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  description              = "Allow admin bastion to access EKS control plane (kubectl)"
+}
