@@ -179,8 +179,8 @@ resource "aws_security_group_rule" "node_to_internet" {
 
 resource "aws_security_group_rule" "endpoints_to_node_https" {
   type                     = "ingress"
-  security_group_id        = module.sg_node.id
-  source_security_group_id = module.sg_endpoints.id
+  security_group_id        = module.sg_endpoints.id
+  source_security_group_id = module.sg_node.id
   from_port                = 443
   to_port                  = 443
   protocol                 = "tcp"
