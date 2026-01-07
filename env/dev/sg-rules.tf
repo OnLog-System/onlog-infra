@@ -196,3 +196,13 @@ resource "aws_security_group_rule" "endpoints_egress_all" {
   cidr_blocks       = ["0.0.0.0/0"]
   description       = "VPC Interface Endpoints outbound response traffic"
 }
+
+resource "aws_security_group_rule" "endpoints_from_vpc_cidr_https" {
+  type              = "ingress"
+  security_group_id = module.sg_endpoints.id
+  from_port   = 443
+  to_port     = 443
+  protocol    = "tcp"
+  cidr_blocks = [var.vpc_cidr]
+  description = "EKS bootstrap / aws-vpc-cni-init access from VPC CIDR"
+}
