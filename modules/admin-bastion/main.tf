@@ -53,6 +53,10 @@ EOS
 systemctl daemon-reload
 systemctl enable tailscale-autoup
 sudo systemctl start tailscale-autoup
+
+curl -LO "https://dl.k8s.io/release/$(curl -Ls https://dl.k8s.io/release/stable.txt)/bin/linux/arm64/kubectl"
+chmod +x kubectl
+sudo mv kubectl /usr/local/bin/
 EOF
 
   tags = merge(
