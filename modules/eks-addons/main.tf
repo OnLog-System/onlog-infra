@@ -6,6 +6,15 @@ locals {
 }
 
 #########################################
+# EKS Pod Identity Agent Addon (필수)
+#########################################
+resource "aws_eks_addon" "pod_identity_agent" {
+  count        = local.enabled ? 1 : 0
+  cluster_name = var.cluster_name
+  addon_name   = "eks-pod-identity-agent"
+}
+
+#########################################
 # VPC CNI Addon
 #########################################
 resource "aws_eks_addon" "vpc_cni" {
@@ -76,6 +85,7 @@ resource "aws_eks_addon" "ebs_csi" {
   service_account_role_arn = aws_iam_role.ebs_csi[0].arn
 
   depends_on = [
+    aws_eks_addon.pod_identity_agent,
     aws_iam_role_policy_attachment.ebs_csi,
     aws_eks_addon.coredns
   ]
