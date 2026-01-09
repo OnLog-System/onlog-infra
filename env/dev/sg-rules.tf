@@ -158,6 +158,16 @@ resource "aws_security_group_rule" "node_to_msk" {
   description              = "EKS NodeGroup to MSK (IAM TLS)"
 }
 
+resource "aws_security_group_rule" "bastion_to_msk_iam" {
+  type                     = "ingress"
+  security_group_id        = module.sg_msk.id
+  source_security_group_id = module.sg_admin_bastion.id
+  from_port                = 9098
+  to_port                  = 9098
+  protocol                 = "tcp"
+  description              = "Admin bastion (RPi via Tailscale) to MSK (IAM TLS)"
+}
+
 ############################################################
 # 7. NodeGroup → Internet (NAT via Private Subnet)
 ############################################################
