@@ -54,8 +54,6 @@ resource "aws_eks_addon" "coredns" {
 #########################################
 # EBS CSI Driver Addon
 #########################################
-data "aws_caller_identity" "current" {}
-data "aws_region" "current" {}
 
 resource "aws_iam_role" "ebs_csi" {
   count = local.enabled ? 1 : 0
@@ -64,19 +62,15 @@ resource "aws_iam_role" "ebs_csi" {
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
+      Sid    = "AllowEksAuthToAssumeRoleForPodIdentity"
       Effect = "Allow"
       Principal = {
         Service = "pods.eks.amazonaws.com"
       }
-      Action = "sts:AssumeRoleWithWebIdentity"
-      Condition = {
-        StringEquals = {
-          "aws:SourceAccount" = data.aws_caller_identity.current.account_id
-        }
-        ArnLike = {
-          "aws:SourceArn" = "arn:aws:eks:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:cluster/${var.cluster_name}"
-        }
-      }
+      Action = [
+        "sts:AssumeRole",
+        "sts:TagSession"
+      ]
     }]
   })
 }
