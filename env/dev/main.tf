@@ -249,7 +249,7 @@ module "admin_bastion" {
 module "eks_addons" {
   source = "../../modules/eks-addons"
 
-  cluster_name    = module.eks.cluster_name
-  enable_addons   = var.enable_eks
-  depends_on      = [module.eks, module.eks_nodegroup]
+  cluster_name  = module.eks.cluster_name
+  enable_addons = var.enable_eks
+  depends_on    = [module.eks, module.eks_nodegroup]
 }
