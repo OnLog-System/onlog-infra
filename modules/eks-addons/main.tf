@@ -66,7 +66,7 @@ resource "aws_iam_role" "ebs_csi" {
       Principal = {
         Service = "pods.eks.amazonaws.com"
       }
-      Action = "sts:AssumeRole"
+      Action = "sts:AssumeRoleWithWebIdentity"
     }]
   })
 }
