@@ -62,11 +62,15 @@ resource "aws_iam_role" "ebs_csi" {
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
+      Sid    = "AllowEksAuthToAssumeRoleForPodIdentity"
       Effect = "Allow"
       Principal = {
         Service = "pods.eks.amazonaws.com"
       }
-      Action = "sts:AssumeRole"
+      Action = [
+        "sts:AssumeRole",
+        "sts:TagSession"
+      ]
     }]
   })
 }
