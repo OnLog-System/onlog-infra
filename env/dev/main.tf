@@ -242,3 +242,14 @@ module "admin_bastion" {
   eice_ssh_policy_arn = aws_iam_policy.eice_ssh_receive.arn
   tags                = var.tags
 }
+
+############################################################
+# 16. EKS Addons
+############################################################
+module "eks_addons" {
+  source = "../../modules/eks-addons"
+
+  cluster_name  = module.eks_control_plane.cluster_name
+  enable_addons = var.enable_eks
+  depends_on    = [module.eks_control_plane, module.eks_nodegroups]
+}
