@@ -251,5 +251,5 @@ module "eks_addons" {
 
   cluster_name  = module.eks.cluster_name
   enable_addons = var.enable_eks
-  depends_on    = [module.eks, module.eks_nodegroup]
+  depends_on    = [module.eks_control_plane, module.eks_nodegroup]
 }
