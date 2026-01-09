@@ -81,6 +81,7 @@ resource "aws_iam_role_policy_attachment" "ebs_csi" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
 }
 
+# 콘솔은 자동으로 해주지만 Terraform 은 수동으로 필요함
 resource "aws_eks_pod_identity_association" "ebs_csi" {
   count = local.enabled ? 1 : 0
 
