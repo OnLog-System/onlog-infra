@@ -268,3 +268,13 @@ resource "aws_security_group_rule" "bastion_to_timescaledb_ssh" {
   source_security_group_id = module.sg_admin_bastion.id
   description              = "Admin bastion to TimescaleDB SSH access"
 }
+
+resource "aws_security_group_rule" "timescaledb_to_outbound" {
+  type                     = "egress"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  security_group_id        = module.sg_timescaledb.id
+  cidr_blocks              = ["0.0.0.0/0"]
+  description              = "TimescaleDB outbound traffic"
+}
