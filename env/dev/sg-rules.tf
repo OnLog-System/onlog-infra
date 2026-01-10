@@ -270,11 +270,11 @@ resource "aws_security_group_rule" "bastion_to_timescaledb_ssh" {
 }
 
 resource "aws_security_group_rule" "timescaledb_to_outbound" {
-  type                     = "egress"
-  from_port                = 0
-  to_port                  = 0
-  protocol                 = "-1"
-  security_group_id        = module.sg_timescaledb.id
-  cidr_blocks              = ["0.0.0.0/0"]
-  description              = "TimescaleDB outbound traffic"
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  security_group_id = module.sg_timescaledb.id
+  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "TimescaleDB outbound traffic"
 }
