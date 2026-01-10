@@ -162,7 +162,6 @@ module "msk" {
   source                   = "../../modules/msk"
   name                     = "msk"
   environment              = var.environment
-  region                   = var.region
   kafka_version            = "3.8.x"
   availability_zones       = var.availability_zones
   brokers_per_az           = 1
