@@ -7,7 +7,7 @@ resource "aws_msk_configuration" "this" {
   kafka_versions = [var.kafka_version]
 
   server_properties = <<EOF
-auto.create.topics.enable=false
+auto.create.topics.enable=true
 default.replication.factor=2
 min.insync.replicas=1
 num.partitions=2
