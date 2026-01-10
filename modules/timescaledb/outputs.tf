@@ -1,7 +1,7 @@
 output "instance_id" {
-  value = length(aws_instance.this) > 0 ? aws_instance.this[0].id : null
+  value = aws_instance.this.id
 }
 
 output "private_ip" {
-  value = length(aws_instance.this) > 0 ? aws_instance.this[0].private_ip : null
+  value = aws_instance.this.private_ip
 }

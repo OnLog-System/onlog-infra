@@ -17,8 +17,6 @@ data "aws_ami" "ubuntu_2204_arm" {
 }
 
 resource "aws_instance" "this" {
-  count                  = 1
-
   ami                    = data.aws_ami.ubuntu_2204_arm.id
   instance_type          = var.instance_type
   subnet_id              = var.subnet_id
@@ -42,8 +40,6 @@ resource "aws_instance" "this" {
 # EBS Volumes for TimescaleDB
 ##############################################
 resource "aws_ebs_volume" "data" {
-  count = 1
-
   size              = var.data_volume_size
   type              = "gp3"
   availability_zone = aws_instance.this.availability_zone
@@ -55,8 +51,6 @@ resource "aws_ebs_volume" "data" {
 }
 
 resource "aws_ebs_volume" "wal" {
-  count = 1
-
   size              = var.wal_volume_size
   type              = "gp3"
   availability_zone = aws_instance.this.availability_zone
@@ -68,16 +62,12 @@ resource "aws_ebs_volume" "wal" {
 }
 
 resource "aws_volume_attachment" "data" {
-  count = 1
-  
   device_name = "/dev/nvme1n1"
   volume_id   = aws_ebs_volume.data.id
   instance_id = aws_instance.this.id
 }
 
 resource "aws_volume_attachment" "wal" {
-  count = 1
-
   device_name = "/dev/nvme2n1"
   volume_id   = aws_ebs_volume.wal.id
   instance_id = aws_instance.this.id
