@@ -127,7 +127,7 @@ variable "tailscale_auth_key" {
 
 variable "enable_msk" {
   type    = bool
-  default = true
+  default = false
 }
 
 variable "enable_msk_public_access" {
@@ -137,10 +137,10 @@ variable "enable_msk_public_access" {
 
 variable "enable_eks" {
   type    = bool
-  default = true
+  default = false
 }
 
 variable "enable_timescaledb" {
   type    = bool
-  default = true
+  default = false
 }
