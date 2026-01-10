@@ -62,13 +62,13 @@ resource "aws_ebs_volume" "wal" {
 }
 
 resource "aws_volume_attachment" "data" {
-  device_name = "/dev/nvme1n1"
+  device_name = "/dev/sdf"
   volume_id   = aws_ebs_volume.data.id
   instance_id = aws_instance.this.id
 }
 
 resource "aws_volume_attachment" "wal" {
-  device_name = "/dev/nvme2n1"
+  device_name = "/dev/sdg"
   volume_id   = aws_ebs_volume.wal.id
   instance_id = aws_instance.this.id
 }
