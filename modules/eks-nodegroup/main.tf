@@ -16,9 +16,9 @@ resource "aws_eks_node_group" "this" {
   instance_types = [var.instance_type]
   capacity_type  = var.capacity_type
 
-  remote_access {
-    ec2_ssh_key  = "dev-admin-bastion-labpc"
-  }
+  # remote_access {
+  #   ec2_ssh_key  = "dev-admin-bastion-labpc"
+  # }
 
   update_config {
     max_unavailable = 1
