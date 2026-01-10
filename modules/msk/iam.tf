@@ -16,7 +16,9 @@ resource "aws_iam_policy" "msk_producer" {
         Effect = "Allow"
         Action = [
           "kafka-cluster:Connect",
-          "kafka-cluster:DescribeCluster"
+          "kafka-cluster:DescribeCluster",
+          "kafka-cluster:CreateTopic",
+          "kafka-cluster:AlterTopic"
         ]
         Resource = "arn:aws:kafka:${var.region}:${data.aws_caller_identity.current.account_id}:cluster/${var.environment}-${var.name}/*"
       },
