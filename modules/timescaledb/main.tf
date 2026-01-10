@@ -23,6 +23,11 @@ resource "aws_instance" "this" {
   vpc_security_group_ids = var.security_group_ids
   key_name               = var.key_name
 
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
+
   user_data = file("${path.module}/userdata.sh")
 
   tags = merge(
