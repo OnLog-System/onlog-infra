@@ -231,3 +231,29 @@ resource "aws_security_group_rule" "bastion_to_cluster_sg" {
   protocol                 = "tcp"
   description              = "Allow admin bastion to access EKS control plane (kubectl)"
 }
+
+############################################################
+# 10. TimescaleDB Access Rules
+############################################################
+
+# # Kafka ingest → TimescaleDB
+# resource "aws_security_group_rule" "ingest_to_timescaledb" {
+#   type                     = "ingress"
+#   from_port                = 5432
+#   to_port                  = 5432
+#   protocol                 = "tcp"
+#   security_group_id        = module.sg.timescaledb_id
+#   source_security_group_id = module.sg.ingest_id
+#   description              = "Kafka ingest to TimescaleDB"
+# }
+
+# # Grafana → TimescaleDB
+# resource "aws_security_group_rule" "grafana_to_timescaledb" {
+#   type                     = "ingress"
+#   from_port                = 5432
+#   to_port                  = 5432
+#   protocol                 = "tcp"
+#   security_group_id        = module.sg.timescaledb_id
+#   source_security_group_id = module.sg.grafana_id
+#   description              = "Grafana to TimescaleDB"
+# }

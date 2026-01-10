@@ -253,3 +253,32 @@ module "eks_addons" {
   enable_addons = var.enable_eks
   depends_on    = [module.eks_control_plane, module.eks_nodegroups]
 }
+
+############################################################
+# 17. SG: TimescaleDB
+############################################################
+module "sg_timescaledb" {
+  source      = "../../modules/sg/timescaledb"
+  name        = "timescaledb"
+  vpc_id      = module.vpc.vpc_id
+  environment = var.environment
+  tags        = var.tags
+}
+
+
+############################################################
+# 18. TimescaleDB EC2 Instance
+############################################################
+module "timescaledb" {
+  source             = "../../modules/timescaledb"
+  count              = var.enable_timescaledb ? 1 : 0
+  name               = "timescaledb"
+  subnet_id          = values(module.vpc.data_private_subnets_by_az)[0]
+  security_group_ids = [module.sg_timescaledb.id]
+  instance_type      = "m6g.large"
+  data_volume_size   = 200
+  wal_volume_size    = 100
+  key_name           = aws_key_pair.admin_bastion_labpc.key_name
+  environment        = var.environment
+  tags               = var.tags
+}
