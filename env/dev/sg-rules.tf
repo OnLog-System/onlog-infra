@@ -257,3 +257,14 @@ resource "aws_security_group_rule" "bastion_to_cluster_sg" {
 #   source_security_group_id = module.sg.grafana_id
 #   description              = "Grafana to TimescaleDB"
 # }
+
+# Admin Bastion → TimescaleDB (SSH)
+resource "aws_security_group_rule" "bastion_to_timescaledb_ssh" {
+  type                     = "ingress"
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
+  security_group_id        = module.sg_timescaledb.id
+  source_security_group_id = module.sg_admin_bastion.id
+  description              = "Admin bastion to TimescaleDB SSH access"
+}
