@@ -49,23 +49,26 @@ chmod 700 $DATA_MNT
 ########################################
 # 4. PostgreSQL PGDG Repository
 ########################################
-install -d /usr/share/postgresql-common/pgdg
-curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
-  | gpg --dearmor -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.gpg
+apt-get install -y gnupg curl ca-certificates
 
-echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.gpg] \
-https://apt.postgresql.org/pub/repos/apt \
-jammy-pgdg main" \
-> /etc/apt/sources.list.d/pgdg.list
+curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+  | gpg --dearmor \
+  | tee /usr/share/keyrings/postgresql.gpg > /dev/null
+
+echo "deb [signed-by=/usr/share/keyrings/postgresql.gpg] \
+https://apt.postgresql.org/pub/repos/apt jammy-pgdg main" \
+  | tee /etc/apt/sources.list.d/pgdg.list
 
 ########################################
 # 5. TimescaleDB Repository
 ########################################
 curl -fsSL https://packagecloud.io/timescale/timescaledb/gpgkey \
-  | gpg --dearmor -o /etc/apt/trusted.gpg.d/timescaledb.gpg
+  | gpg --dearmor \
+  | tee /usr/share/keyrings/timescaledb.gpg > /dev/null
 
-echo "deb https://packagecloud.io/timescale/timescaledb/ubuntu/ jammy main" \
-> /etc/apt/sources.list.d/timescaledb.list
+echo "deb [signed-by=/usr/share/keyrings/timescaledb.gpg] \
+https://packagecloud.io/timescale/timescaledb/ubuntu/ jammy main" \
+  | tee /etc/apt/sources.list.d/timescaledb.list
 
 apt-get update -y
 
