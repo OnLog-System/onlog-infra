@@ -40,9 +40,8 @@ resource "aws_instance" "this" {
   )
 }
 
-
 ##############################################
-# EBS Volumes for TimescaleDB
+# Single EBS Volume for Data + WAL
 ##############################################
 resource "aws_ebs_volume" "data" {
   size              = var.data_volume_size
@@ -55,26 +54,8 @@ resource "aws_ebs_volume" "data" {
   )
 }
 
-resource "aws_ebs_volume" "wal" {
-  size              = var.wal_volume_size
-  type              = "gp3"
-  availability_zone = aws_instance.this.availability_zone
-
-  tags = merge(
-    var.tags,
-    { Name = "${var.environment}-${var.name}-wal" }
-  )
-}
-
 resource "aws_volume_attachment" "data" {
   device_name = "/dev/sdf"
   volume_id   = aws_ebs_volume.data.id
   instance_id = aws_instance.this.id
 }
-
-resource "aws_volume_attachment" "wal" {
-  device_name = "/dev/sdg"
-  volume_id   = aws_ebs_volume.wal.id
-  instance_id = aws_instance.this.id
-}
-
