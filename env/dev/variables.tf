@@ -142,5 +142,5 @@ variable "enable_eks" {
 
 variable "enable_timescaledb" {
   type    = bool
-  default = true
+  default = false
 }
