@@ -43,14 +43,9 @@ grep -q "$DATA_UUID" /etc/fstab || \
 
 mount -a
 
-chown postgres:postgres $DATA_MNT
-chmod 700 $DATA_MNT
-
 ########################################
 # 4. PostgreSQL PGDG Repository
 ########################################
-apt-get install -y gnupg curl ca-certificates
-
 curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
   | gpg --dearmor \
   | tee /usr/share/keyrings/postgresql.gpg > /dev/null
@@ -81,19 +76,25 @@ apt-get install -y \
   timescaledb-2-postgresql-$PG_VERSION
 
 ########################################
-# 7. 기본 클러스터 제거
+# 7. EBS 권한 설정 (postgres 사용자 생성 이후)
+########################################
+chown postgres:postgres $DATA_MNT
+chmod 700 $DATA_MNT
+
+########################################
+# 8. 기본 클러스터 제거
 ########################################
 pg_dropcluster --stop $PG_VERSION $PG_CLUSTER || true
 
 ########################################
-# 8. EBS 경로에서 클러스터 생성 (핵심)
+# 9. EBS 경로에서 클러스터 생성 (핵심)
 ########################################
 pg_createcluster $PG_VERSION $PG_CLUSTER \
   -d $DATA_MNT \
   --start
 
 ########################################
-# 9. PostgreSQL 설정 (공식 위치)
+# 10. PostgreSQL 설정
 ########################################
 CONF="/etc/postgresql/$PG_VERSION/$PG_CLUSTER/postgresql.conf"
 
@@ -101,7 +102,7 @@ grep -q "shared_preload_libraries.*timescaledb" $CONF || \
   echo "shared_preload_libraries = 'timescaledb'" >> $CONF
 
 ########################################
-# 10. 서비스 재시작 및 활성화
+# 11. 재시작 및 활성화
 ########################################
 systemctl restart postgresql@$PG_VERSION-$PG_CLUSTER
 systemctl enable postgresql
