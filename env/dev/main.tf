@@ -284,16 +284,25 @@ module "timescaledb" {
 }
 
 #############################################################
-# 19. Kafka Streams
+# 19. SG: Kafka Streams
+#############################################################
+module "sg_kafka_streams" {
+  source      = "../../modules/sg/kafka-streams"
+  name        = "kafka-streams"
+  vpc_id      = module.vpc.vpc_id
+  environment = var.environment
+  tags        = var.tags
+}
+
+#############################################################
+# 20. Kafka Streams
 #############################################################
 module "kafka_streams" {
   source = "../../modules/kafka-streams"
-  name                  = "kafka-streams"
-  environment           = var.environment
-  ami_id                = data.aws_ami.ubuntu_2204_arm.id
-  subnet_id             = module.vpc.private_subnets[0]
-  security_group_ids    = [module.sg.kafka_streams.id]
-  iam_instance_profile  = aws_iam_instance_profile.kafka_streams.name
-  key_name              = aws_key_pair.admin_bastion_labpc.key_name
-  tags                  = var.tags
+  name                = "kafka-streams"
+  environment         = var.environment
+  subnet_id           = values(module.vpc.app_private_subnets_by_az)[0]
+  security_group_ids  = [module.sg_kafka_streams.id]
+  key_name            = aws_key_pair.admin_bastion_labpc.key_name
+  tags                = var.tags
 }
