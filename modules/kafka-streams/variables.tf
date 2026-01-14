@@ -5,19 +5,29 @@ variable "name" {
 variable "environment" {
   type = string
 }
-variable "ami_id" {}
+
 variable "instance_type" {
+  type    = string
   default = "m6g.large"
 }
-variable "subnet_id" {}
+
+variable "subnet_id" {
+  type = string
+}
+
 variable "security_group_ids" {
   type = list(string)
 }
-variable "iam_instance_profile" {}
-variable "key_name" {}
+
+variable "key_name" {
+  type = string
+}
+
 variable "root_volume_size" {
+  type    = number
   default = 50
 }
+
 variable "tags" {
   type = map(string)
 }

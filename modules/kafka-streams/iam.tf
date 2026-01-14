@@ -1,44 +1,69 @@
-###############################################
-# Kafka Streams IAM Policy (Wildcard)
-###############################################
+######################################################
+# IAM Role
+######################################################
+resource "aws_iam_role" "this" {
+  name = "${var.environment}-${var.name}-role"
 
-resource "aws_iam_policy" "kafka_streams" {
-  name        = "${var.environment}-${var.name}-kafka-streams"
-  description = "Kafka Streams full topic access (wildcard)"
-
-  policy = jsonencode(
-    {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-        "Effect": "Allow",
-        "Action": [
-            "kafka-cluster:Connect",
-            "kafka-cluster:DescribeCluster",
-            "kafka-cluster:DescribeTopic",
-            "kafka-cluster:ReadData",
-            "kafka-cluster:WriteData"
-        ],
-        "Resource": "*"
-        },
-        {
-        "Effect": "Allow",
-        "Action": [
-            "logs:CreateLogGroup",
-            "logs:CreateLogStream",
-            "logs:PutLogEvents"
-        ],
-        "Resource": "*"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
         }
+        Action = "sts:AssumeRole"
+      }
     ]
-    })
+  })
 }
 
-###############################################
-# Attach to existing IAM user
-###############################################
+######################################################
+# IAM Policy and Instance Profile
+######################################################
+resource "aws_iam_policy" "this" {
+  name        = "${var.environment}-${var.name}-policy"
+  description = "Kafka Streams access to MSK and CloudWatch Logs"
 
-resource "aws_iam_user_policy_attachment" "kafka_streams_attach" {
-  user       = "rpi-ef-kafka-streams"
-  policy_arn = aws_iam_policy.kafka_streams.arn
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "kafka-cluster:Connect",
+          "kafka-cluster:DescribeCluster",
+          "kafka-cluster:DescribeTopic",
+          "kafka-cluster:ReadData",
+          "kafka-cluster:WriteData"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+#######################################################
+# Attachments
+#######################################################
+resource "aws_iam_role_policy_attachment" "this" {
+  role       = aws_iam_role.this.name
+  policy_arn = aws_iam_policy.this.arn
+}
+
+#######################################################
+# Instance Profile
+#######################################################
+resource "aws_iam_instance_profile" "this" {
+  name = "${var.environment}-${var.name}-instance-profile"
+  role = aws_iam_role.this.name
 }
