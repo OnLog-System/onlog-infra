@@ -168,6 +168,16 @@ resource "aws_security_group_rule" "bastion_to_msk_iam" {
   description              = "Admin bastion (RPi via Tailscale) to MSK (IAM TLS)"
 }
 
+resource "aws_security_group_rule" "kafka_streams_to_msk" {
+  type                     = "ingress"
+  security_group_id        = module.sg_msk.id
+  source_security_group_id = module.sg_kafka_streams.id
+  from_port                = 9098
+  to_port                  = 9098
+  protocol                 = "tcp"
+  description              = "Kafka Streams EC2 to MSK (IAM TLS)"
+}
+
 ############################################################
 # 7. NodeGroup → Internet (NAT via Private Subnet)
 ############################################################
@@ -277,4 +287,57 @@ resource "aws_security_group_rule" "timescaledb_to_outbound" {
   security_group_id = module.sg_timescaledb.id
   cidr_blocks       = ["0.0.0.0/0"]
   description       = "TimescaleDB outbound traffic"
+}
+
+############################################################
+# 11. Kafka Streams EC2 Access Rules
+############################################################
+resource "aws_security_group_rule" "bastion_to_kafka_streams_ssh" {
+  type                     = "ingress"
+  security_group_id        = module.sg_kafka_streams.id
+  source_security_group_id = module.sg_admin_bastion.id
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
+  description              = "Admin bastion SSH access to Kafka Streams EC2"
+}
+
+resource "aws_security_group_rule" "eice_to_kafka_streams_ssh" {
+  type                     = "ingress"
+  security_group_id        = module.sg_kafka_streams.id
+  source_security_group_id = module.sg_eice.id
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
+  description              = "EICE SSH access to Kafka Streams EC2"
+}
+
+resource "aws_security_group_rule" "kafka_streams_to_endpoints" {
+  type                     = "egress"
+  security_group_id        = module.sg_kafka_streams.id
+  source_security_group_id = module.sg_endpoints.id
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  description              = "Kafka Streams outbound HTTPS to VPC Interface Endpoints"
+}
+
+resource "aws_security_group_rule" "endpoints_to_kafka_streams" {
+  type                     = "ingress"
+  security_group_id        = module.sg_kafka_streams.id
+  source_security_group_id = module.sg_endpoints.id
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  description              = "VPC Interface Endpoints response to Kafka Streams"
+}
+
+resource "aws_security_group_rule" "kafka_streams_to_internet" {
+  type              = "egress"
+  security_group_id = module.sg_kafka_streams.id
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "Kafka Streams outbound internet access via NAT"
 }
