@@ -298,11 +298,11 @@ module "sg_kafka_streams" {
 # 20. Kafka Streams
 #############################################################
 module "kafka_streams" {
-  source = "../../modules/kafka-streams"
-  name                = "kafka-streams"
-  environment         = var.environment
-  subnet_id           = values(module.vpc.app_private_subnets_by_az)[0]
-  security_group_ids  = [module.sg_kafka_streams.id]
-  key_name            = aws_key_pair.admin_bastion_labpc.key_name
-  tags                = var.tags
+  source             = "../../modules/kafka-streams"
+  name               = "kafka-streams"
+  environment        = var.environment
+  subnet_id          = values(module.vpc.app_private_subnets_by_az)[0]
+  security_group_ids = [module.sg_kafka_streams.id]
+  key_name           = aws_key_pair.admin_bastion_labpc.key_name
+  tags               = var.tags
 }
