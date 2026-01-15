@@ -13,7 +13,8 @@ apt-get install -y \
   awscli \
   jq \
   curl \
-  ca-certificates
+  ca-certificates \
+  maven
 
 ########################################
 # 1. Timezone
