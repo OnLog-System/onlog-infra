@@ -322,7 +322,7 @@ module "sg_kafka_consumers" {
 # 20. Kafka Consumers
 #############################################################
 module "kafka_consumers" {
-  source             = "../../modules/consumers"
+  source             = "../../modules/kafka-consumers"
   name               = "kafka-consumers"
   environment        = var.environment
   subnet_id          = values(module.vpc.app_private_subnets_by_az)[0]
