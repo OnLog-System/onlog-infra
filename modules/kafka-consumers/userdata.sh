@@ -22,7 +22,7 @@ apt-get install -y \
 timedatectl set-timezone Asia/Seoul
 
 ########################################
-# 2. Java env
+# 2. Java environment
 ########################################
 JAVA_HOME_PATH="/usr/lib/jvm/java-17-openjdk-arm64"
 
@@ -38,13 +38,15 @@ chmod +x /etc/profile.d/java.sh
 ########################################
 BASE_DIR="/opt/onlog"
 SRC_DIR="${BASE_DIR}/src"
-STATE_DIR="/var/lib/kafka-streams"
+LOG_DIR="/var/log/onlog"
+SYSTEMD_DIR="/etc/systemd/system"
 
 mkdir -p \
   ${SRC_DIR} \
-  ${STATE_DIR}
+  ${LOG_DIR} \
+  ${SYSTEMD_DIR}
 
-chown -R ubuntu:ubuntu ${BASE_DIR} ${STATE_DIR}
+chown -R ubuntu:ubuntu ${BASE_DIR} ${LOG_DIR}
 
 ########################################
 # 4. SSH known_hosts for GitHub
@@ -54,7 +56,7 @@ sudo -u ubuntu ssh-keyscan github.com >> /home/ubuntu/.ssh/known_hosts
 chmod 644 /home/ubuntu/.ssh/known_hosts
 
 ########################################
-# 5. Clone onlog-pipeline repo
+# 5. Clone onlog-pipeline repository
 ########################################
 REPO_DIR="${SRC_DIR}/onlog-pipeline"
 REPO_URL="git@github.com:OnLog-System/onlog-pipeline.git"
@@ -66,4 +68,4 @@ fi
 ########################################
 # 6. Done
 ########################################
-echo "OnLog Kafka Streams EC2 bootstrap completed"
+echo "OnLog Kafka Consumers EC2 bootstrap completed"
