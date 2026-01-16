@@ -306,3 +306,27 @@ module "kafka_streams" {
   key_name           = aws_key_pair.admin_bastion_labpc.key_name
   tags               = var.tags
 }
+
+#############################################################
+# 19. SG: Kafka Consumers
+#############################################################
+module "sg_kafka_consumers" {
+  source      = "../../modules/sg/kafka-consumers"
+  name        = "kafka-consumers"
+  vpc_id      = module.vpc.vpc_id
+  environment = var.environment
+  tags        = var.tags
+}
+
+#############################################################
+# 20. Kafka Consumers
+#############################################################
+module "kafka_consumers" {
+  source             = "../../modules/consumers"
+  name               = "kafka-consumers"
+  environment        = var.environment
+  subnet_id          = values(module.vpc.app_private_subnets_by_az)[0]
+  security_group_ids = [module.sg_kafka_consumers.id]
+  key_name           = aws_key_pair.admin_bastion_labpc.key_name
+  tags               = var.tags
+}
