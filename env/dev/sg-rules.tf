@@ -178,6 +178,16 @@ resource "aws_security_group_rule" "kafka_streams_to_msk" {
   description              = "Kafka Streams EC2 to MSK (IAM TLS)"
 }
 
+resource "aws_security_group_rule" "kafka_consumers_to_msk" {
+  type                     = "ingress"
+  security_group_id        = module.sg_msk.id
+  source_security_group_id = module.sg_kafka_consumers.id
+  from_port                = 9098
+  to_port                  = 9098
+  protocol                 = "tcp"
+  description              = "Kafka Consumers EC2 to MSK (IAM TLS)"
+}
+
 ############################################################
 # 7. NodeGroup → Internet (NAT via Private Subnet)
 ############################################################
@@ -246,17 +256,6 @@ resource "aws_security_group_rule" "bastion_to_cluster_sg" {
 # 10. TimescaleDB Access Rules
 ############################################################
 
-# # Kafka ingest → TimescaleDB
-# resource "aws_security_group_rule" "ingest_to_timescaledb" {
-#   type                     = "ingress"
-#   from_port                = 5432
-#   to_port                  = 5432
-#   protocol                 = "tcp"
-#   security_group_id        = module.sg.timescaledb_id
-#   source_security_group_id = module.sg.ingest_id
-#   description              = "Kafka ingest to TimescaleDB"
-# }
-
 # # Grafana → TimescaleDB
 # resource "aws_security_group_rule" "grafana_to_timescaledb" {
 #   type                     = "ingress"
@@ -287,6 +286,16 @@ resource "aws_security_group_rule" "timescaledb_to_outbound" {
   security_group_id = module.sg_timescaledb.id
   cidr_blocks       = ["0.0.0.0/0"]
   description       = "TimescaleDB outbound traffic"
+}
+
+resource "aws_security_group_rule" "kafka_consumers_to_timescaledb" {
+  type                     = "ingress"
+  security_group_id        = module.sg_timescaledb.id
+  source_security_group_id = module.sg_kafka_consumers.id
+  from_port                = 5432
+  to_port                  = 5432
+  protocol                 = "tcp"
+  description              = "Kafka Consumers ingest to TimescaleDB"
 }
 
 ############################################################
@@ -340,4 +349,61 @@ resource "aws_security_group_rule" "kafka_streams_to_internet" {
   protocol          = "-1"
   cidr_blocks       = ["0.0.0.0/0"]
   description       = "Kafka Streams outbound internet access via NAT"
+}
+
+############################################################
+# 12. Kafka Consumers EC2 Access Rules
+############################################################
+# Consumers → Endpoints
+resource "aws_security_group_rule" "kafka_consumers_to_endpoints" {
+  type                     = "egress"
+  security_group_id        = module.sg_kafka_consumers.id
+  source_security_group_id = module.sg_endpoints.id
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  description              = "Kafka Consumers outbound HTTPS to VPC Endpoints"
+}
+
+# Endpoints → Consumers
+resource "aws_security_group_rule" "endpoints_to_kafka_consumers" {
+  type                     = "ingress"
+  security_group_id        = module.sg_kafka_consumers.id
+  source_security_group_id = module.sg_endpoints.id
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  description              = "VPC Endpoints response to Kafka Consumers"
+}
+
+# Bastion → Kafka Consumers
+resource "aws_security_group_rule" "bastion_to_kafka_consumers_ssh" {
+  type                     = "ingress"
+  security_group_id        = module.sg_kafka_consumers.id
+  source_security_group_id = module.sg_admin_bastion.id
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
+  description              = "Admin bastion SSH access to Kafka Consumers EC2"
+}
+
+# EICE → Kafka Consumers
+resource "aws_security_group_rule" "eice_to_kafka_consumers_ssh" {
+  type                     = "ingress"
+  security_group_id        = module.sg_kafka_consumers.id
+  source_security_group_id = module.sg_eice.id
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
+  description              = "EICE SSH access to Kafka Consumers EC2"
+}
+
+resource "aws_security_group_rule" "kafka_consumers_to_internet" {
+  type              = "egress"
+  security_group_id = module.sg_kafka_consumers.id
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "Kafka Consumers outbound internet access via NAT"
 }
