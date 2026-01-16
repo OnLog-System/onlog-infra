@@ -31,11 +31,22 @@ resource "aws_iam_policy" "this" {
       {
         Effect = "Allow"
         Action = [
+          # ===== MSK Core =====
           "kafka-cluster:Connect",
           "kafka-cluster:DescribeCluster",
+          "kafka-cluster:DescribeClusterDynamicConfiguration",
+
+          # ===== Topic =====
           "kafka-cluster:DescribeTopic",
+          "kafka-cluster:CreateTopic",
+
+          # ===== Data =====
           "kafka-cluster:ReadData",
-          "kafka-cluster:WriteData"
+          "kafka-cluster:WriteData",
+
+          # ===== Consumer Group (Streams 필수) =====
+          "kafka-cluster:DescribeGroup",
+          "kafka-cluster:AlterGroup"
         ]
         Resource = "*"
       },
@@ -51,6 +62,7 @@ resource "aws_iam_policy" "this" {
     ]
   })
 }
+
 
 #######################################################
 # Attachments
