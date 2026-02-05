@@ -35,10 +35,7 @@ module "sg_onlog_prod" {
   name        = "onlog-prod"
   vpc_id      = module.vpc.vpc_id
   environment = "prod"
-
-  # SSH: key-only (IP 제한 없음)
-  ssh_allowed_cidrs = ["0.0.0.0/0"]
-
+  
   tags = local.tags
 }
 
