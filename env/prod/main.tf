@@ -10,7 +10,7 @@ locals {
 }
 
 ############################################################
-# 1. VPC (Single AZ / Single Public Subnet)
+# 1. VPC (Single AZ / Public only)
 ############################################################
 module "vpc" {
   source = "../../modules/vpc"
@@ -36,17 +36,14 @@ module "sg_onlog_prod" {
   vpc_id      = module.vpc.vpc_id
   environment = "prod"
 
-  ssh_allowed_cidrs = var.ssh_allowed_cidrs
+  # SSH: key-only (IP 제한 없음)
+  ssh_allowed_cidrs = ["0.0.0.0/0"]
 
   tags = local.tags
 }
 
 ############################################################
 # 3. EC2 (All-in-One)
-# - FastAPI
-# - TimescaleDB
-# - Grafana
-# - Batch / Replay
 ############################################################
 module "onlog_prod_ec2" {
   source = "../../modules/timescaledb"
@@ -58,7 +55,7 @@ module "onlog_prod_ec2" {
   security_group_ids = [module.sg_onlog_prod.id]
 
   instance_type = "t4g.large"
-  key_name      = var.key_name
+  key_name      = aws_key_pair.onlog_prod_labpc.key_name
 
   # Storage
   data_volume_size = 100
