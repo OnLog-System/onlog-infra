@@ -17,7 +17,7 @@ apt-get install -y \
 ############################################################
 systemctl enable docker
 systemctl start docker
-usermod -aG docker ec2-user
+usermod -aG docker ubuntu
 
 ############################################################
 # Mount data volume
@@ -41,5 +41,5 @@ echo "UUID=${UUID} ${MOUNT_POINT} xfs defaults,nofail 0 2" >> /etc/fstab
 mkdir -p /srv/onlog
 mkdir -p /srv/onlog/{api,db,grafana,batch,logs}
 
-chown -R ec2-user:ec2-user /srv/onlog
-chown -R ec2-user:ec2-user /data
+chown -R ubuntu:ubuntu /srv/onlog
+chown -R ubuntu:ubuntu /data
