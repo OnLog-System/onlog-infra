@@ -22,6 +22,7 @@ module "vpc" {
   private_subnet_cidrs = []
 
   enable_nat_gateway = false
+  nat_az             = "ap-northeast-2a"
   environment        = "prod"
   tags               = local.tags
 }
