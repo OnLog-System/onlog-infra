@@ -56,3 +56,22 @@ module "onlog_prod_ec2" {
 
   tags = local.tags
 }
+
+############################################################
+# 4. Elastic IP
+############################################################
+resource "aws_eip" "onlog_prod" {
+  domain = "vpc"
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "onlog-prod-eip"
+    }
+  )
+}
+
+resource "aws_eip_association" "onlog_prod" {
+  instance_id   = module.onlog_prod_ec2.instance_id
+  allocation_id = aws_eip.onlog_prod.id
+}
