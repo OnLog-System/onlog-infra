@@ -46,25 +46,15 @@ module "sg_onlog_prod" {
 # 3. EC2 (All-in-One)
 ############################################################
 module "onlog_prod_ec2" {
-  source = "../../modules/timescaledb"
+  source = "../../modules/ec2-onlog-prod"
 
   name               = "onlog-prod"
-  environment        = "prod"
-
   subnet_id          = module.vpc.public_subnet_ids[0]
   security_group_ids = [module.sg_onlog_prod.id]
+  key_name           = aws_key_pair.onlog_prod_labpc.key_name
 
   instance_type = "t4g.large"
-  key_name      = aws_key_pair.onlog_prod_labpc.key_name
-
-  # Storage
   data_volume_size = 100
-  wal_volume_size  = 50
 
-  tags = merge(
-    local.tags,
-    {
-      Role = "all-in-one"
-    }
-  )
+  tags = local.tags
 }
