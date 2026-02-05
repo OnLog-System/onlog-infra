@@ -1,0 +1,409 @@
+############################################################
+# SG Relations (Rules Only)
+# - All inter-SG traffic is managed here
+# - aws_security_group resources define GROUP only
+############################################################
+
+
+############################################################
+# 1. ALB ↔ NodeGroup (Service / NodePort)
+############################################################
+
+# ALB → Node (Service traffic via NodePort)
+resource "aws_security_group_rule" "alb_to_node" {
+  type                     = "ingress"
+  security_group_id        = module.sg_node.id
+  source_security_group_id = module.sg_alb.id
+  from_port                = 30000
+  to_port                  = 32767
+  protocol                 = "tcp"
+  description              = "ALB to NodeGroup NodePort traffic"
+}
+
+# Node → ALB (response traffic)
+resource "aws_security_group_rule" "node_to_alb" {
+  type                     = "egress"
+  security_group_id        = module.sg_node.id
+  source_security_group_id = module.sg_alb.id
+  from_port                = 30000
+  to_port                  = 32767
+  protocol                 = "tcp"
+  description              = "NodeGroup response traffic to ALB"
+}
+
+
+############################################################
+# 2. Control Plane ↔ NodeGroup (Kubernetes Control)
+############################################################
+
+# ControlPlane → Node (kubelet)
+resource "aws_security_group_rule" "cluster_sg_to_node_kubelet" {
+  count                    = var.enable_eks ? 1 : 0
+  type                     = "ingress"
+  security_group_id        = module.sg_node.id
+  source_security_group_id = module.eks_control_plane.cluster_security_group_id
+  from_port                = 10250
+  to_port                  = 10250
+  protocol                 = "tcp"
+  description              = "EKS Control Plane to NodeGroup kubelet"
+}
+
+# ControlPlane → Node (API)
+resource "aws_security_group_rule" "cluster_sg_to_node_api" {
+  count                    = var.enable_eks ? 1 : 0
+  type                     = "ingress"
+  security_group_id        = module.sg_node.id
+  source_security_group_id = module.eks_control_plane.cluster_security_group_id
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  description              = "EKS Control Plane to NodeGroup API"
+}
+
+# Node → ControlPlane
+resource "aws_security_group_rule" "node_to_cluster_sg" {
+  count                    = var.enable_eks ? 1 : 0
+  type                     = "egress"
+  security_group_id        = module.sg_node.id
+  source_security_group_id = module.eks_control_plane.cluster_security_group_id
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  description              = "NodeGroup to EKS Control Plane"
+}
+
+
+############################################################
+# 3. VPC Interface Endpoints ↔ NodeGroup (AWS APIs)
+############################################################
+
+# Node → Endpoints (AWS API calls: ECR, SSM, Logs, etc.)
+resource "aws_security_group_rule" "node_to_endpoints" {
+  type                     = "egress"
+  security_group_id        = module.sg_node.id
+  source_security_group_id = module.sg_endpoints.id
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  description              = "NodeGroup outbound HTTPS to VPC Interface Endpoints"
+}
+
+# Endpoints → Node (response traffic)
+resource "aws_security_group_rule" "endpoints_to_node" {
+  type                     = "ingress"
+  security_group_id        = module.sg_node.id
+  source_security_group_id = module.sg_endpoints.id
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  description              = "VPC Interface Endpoints response traffic to NodeGroup"
+}
+
+
+############################################################
+# 4. EC2 Instance Connect Endpoint (EICE) → NodeGroup (SSH)
+############################################################
+
+# EICE → Node (SSH access)
+resource "aws_security_group_rule" "eice_to_node" {
+  type                     = "ingress"
+  security_group_id        = module.sg_node.id
+  source_security_group_id = module.sg_eice.id
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
+  description              = "SSH access from EC2 Instance Connect Endpoint to NodeGroup"
+}
+
+
+############################################################
+# 5. NodeGroup Internal Communication (Self-Reference)
+############################################################
+
+# Node ↔ Node (Pod-to-Pod, Node-to-Node)
+resource "aws_security_group_rule" "node_self" {
+  type              = "ingress"
+  security_group_id = module.sg_node.id
+  self              = true
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "-1"
+  description       = "Internal NodeGroup communication (ingress)"
+}
+
+# Node → Node (egress)
+resource "aws_security_group_rule" "node_self_egress" {
+  type              = "egress"
+  security_group_id = module.sg_node.id
+  self              = true
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "-1"
+  description       = "Internal NodeGroup communication (egress)"
+}
+
+
+############################################################
+# 6. MSK (Kafka) Access
+############################################################
+
+# Node → MSK (IAM TLS)
+resource "aws_security_group_rule" "node_to_msk" {
+  type                     = "ingress"
+  security_group_id        = module.sg_msk.id
+  source_security_group_id = module.sg_node.id
+  from_port                = 9098
+  to_port                  = 9098
+  protocol                 = "tcp"
+  description              = "EKS NodeGroup to MSK (IAM TLS)"
+}
+
+resource "aws_security_group_rule" "bastion_to_msk_iam" {
+  type                     = "ingress"
+  security_group_id        = module.sg_msk.id
+  source_security_group_id = module.sg_admin_bastion.id
+  from_port                = 9098
+  to_port                  = 9098
+  protocol                 = "tcp"
+  description              = "Admin bastion (RPi via Tailscale) to MSK (IAM TLS)"
+}
+
+resource "aws_security_group_rule" "kafka_streams_to_msk" {
+  type                     = "ingress"
+  security_group_id        = module.sg_msk.id
+  source_security_group_id = module.sg_kafka_streams.id
+  from_port                = 9098
+  to_port                  = 9098
+  protocol                 = "tcp"
+  description              = "Kafka Streams EC2 to MSK (IAM TLS)"
+}
+
+resource "aws_security_group_rule" "kafka_consumers_to_msk" {
+  type                     = "ingress"
+  security_group_id        = module.sg_msk.id
+  source_security_group_id = module.sg_kafka_consumers.id
+  from_port                = 9098
+  to_port                  = 9098
+  protocol                 = "tcp"
+  description              = "Kafka Consumers EC2 to MSK (IAM TLS)"
+}
+
+############################################################
+# 7. NodeGroup → Internet (NAT via Private Subnet)
+############################################################
+
+resource "aws_security_group_rule" "node_to_internet" {
+  type              = "egress"
+  security_group_id = module.sg_node.id
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "NodeGroup outbound internet access via NAT"
+}
+
+
+############################################################
+# 8. VPC Interface Endpoints ↔ NodeGroup (HTTPS)
+############################################################
+
+resource "aws_security_group_rule" "endpoints_to_node_https" {
+  type                     = "ingress"
+  security_group_id        = module.sg_endpoints.id
+  source_security_group_id = module.sg_node.id
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  description              = "VPC Interface Endpoints to EKS NodeGroup (HTTPS)"
+}
+
+resource "aws_security_group_rule" "endpoints_egress_all" {
+  type              = "egress"
+  security_group_id = module.sg_endpoints.id
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "VPC Interface Endpoints outbound response traffic"
+}
+
+resource "aws_security_group_rule" "endpoints_from_vpc_cidr_https" {
+  type              = "ingress"
+  security_group_id = module.sg_endpoints.id
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = [var.vpc_cidr]
+  description       = "EKS bootstrap / aws-vpc-cni-init access from VPC CIDR"
+}
+
+############################################################
+# 9. Admin Bastion → EKS Control Plane (kubectl)
+############################################################
+
+resource "aws_security_group_rule" "bastion_to_cluster_sg" {
+  count                    = var.enable_eks ? 1 : 0
+  type                     = "ingress"
+  security_group_id        = module.eks_control_plane.cluster_security_group_id
+  source_security_group_id = module.sg_admin_bastion.id
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  description              = "Allow admin bastion to access EKS control plane (kubectl)"
+}
+
+############################################################
+# 10. TimescaleDB Access Rules
+############################################################
+
+# # Grafana → TimescaleDB
+# resource "aws_security_group_rule" "grafana_to_timescaledb" {
+#   type                     = "ingress"
+#   from_port                = 5432
+#   to_port                  = 5432
+#   protocol                 = "tcp"
+#   security_group_id        = module.sg.timescaledb_id
+#   source_security_group_id = module.sg.grafana_id
+#   description              = "Grafana to TimescaleDB"
+# }
+
+# Admin Bastion → TimescaleDB (SSH)
+resource "aws_security_group_rule" "bastion_to_timescaledb_ssh" {
+  type                     = "ingress"
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
+  security_group_id        = module.sg_timescaledb.id
+  source_security_group_id = module.sg_admin_bastion.id
+  description              = "Admin bastion to TimescaleDB SSH access"
+}
+
+resource "aws_security_group_rule" "timescaledb_to_outbound" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  security_group_id = module.sg_timescaledb.id
+  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "TimescaleDB outbound traffic"
+}
+
+resource "aws_security_group_rule" "kafka_consumers_to_timescaledb" {
+  type                     = "ingress"
+  security_group_id        = module.sg_timescaledb.id
+  source_security_group_id = module.sg_kafka_consumers.id
+  from_port                = 5432
+  to_port                  = 5432
+  protocol                 = "tcp"
+  description              = "Kafka Consumers ingest to TimescaleDB"
+}
+
+############################################################
+# 11. Kafka Streams EC2 Access Rules
+############################################################
+resource "aws_security_group_rule" "bastion_to_kafka_streams_ssh" {
+  type                     = "ingress"
+  security_group_id        = module.sg_kafka_streams.id
+  source_security_group_id = module.sg_admin_bastion.id
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
+  description              = "Admin bastion SSH access to Kafka Streams EC2"
+}
+
+resource "aws_security_group_rule" "eice_to_kafka_streams_ssh" {
+  type                     = "ingress"
+  security_group_id        = module.sg_kafka_streams.id
+  source_security_group_id = module.sg_eice.id
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
+  description              = "EICE SSH access to Kafka Streams EC2"
+}
+
+resource "aws_security_group_rule" "kafka_streams_to_endpoints" {
+  type                     = "egress"
+  security_group_id        = module.sg_kafka_streams.id
+  source_security_group_id = module.sg_endpoints.id
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  description              = "Kafka Streams outbound HTTPS to VPC Interface Endpoints"
+}
+
+resource "aws_security_group_rule" "endpoints_to_kafka_streams" {
+  type                     = "ingress"
+  security_group_id        = module.sg_kafka_streams.id
+  source_security_group_id = module.sg_endpoints.id
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  description              = "VPC Interface Endpoints response to Kafka Streams"
+}
+
+resource "aws_security_group_rule" "kafka_streams_to_internet" {
+  type              = "egress"
+  security_group_id = module.sg_kafka_streams.id
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "Kafka Streams outbound internet access via NAT"
+}
+
+############################################################
+# 12. Kafka Consumers EC2 Access Rules
+############################################################
+# Consumers → Endpoints
+resource "aws_security_group_rule" "kafka_consumers_to_endpoints" {
+  type                     = "egress"
+  security_group_id        = module.sg_kafka_consumers.id
+  source_security_group_id = module.sg_endpoints.id
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  description              = "Kafka Consumers outbound HTTPS to VPC Endpoints"
+}
+
+# Endpoints → Consumers
+resource "aws_security_group_rule" "endpoints_to_kafka_consumers" {
+  type                     = "ingress"
+  security_group_id        = module.sg_kafka_consumers.id
+  source_security_group_id = module.sg_endpoints.id
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  description              = "VPC Endpoints response to Kafka Consumers"
+}
+
+# Bastion → Kafka Consumers
+resource "aws_security_group_rule" "bastion_to_kafka_consumers_ssh" {
+  type                     = "ingress"
+  security_group_id        = module.sg_kafka_consumers.id
+  source_security_group_id = module.sg_admin_bastion.id
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
+  description              = "Admin bastion SSH access to Kafka Consumers EC2"
+}
+
+# EICE → Kafka Consumers
+resource "aws_security_group_rule" "eice_to_kafka_consumers_ssh" {
+  type                     = "ingress"
+  security_group_id        = module.sg_kafka_consumers.id
+  source_security_group_id = module.sg_eice.id
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
+  description              = "EICE SSH access to Kafka Consumers EC2"
+}
+
+resource "aws_security_group_rule" "kafka_consumers_to_internet" {
+  type              = "egress"
+  security_group_id = module.sg_kafka_consumers.id
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "Kafka Consumers outbound internet access via NAT"
+}

@@ -1,0 +1,27 @@
+output "cluster_name" {
+  value = var.enable ? aws_eks_cluster.this[0].name : null
+}
+
+output "cluster_endpoint" {
+  value = var.enable ? aws_eks_cluster.this[0].endpoint : null
+}
+
+output "cluster_ca" {
+  value = var.enable ? aws_eks_cluster.this[0].certificate_authority[0].data : null
+}
+
+output "cluster_arn" {
+  value = var.enable ? aws_eks_cluster.this[0].arn : null
+}
+
+output "oidc_provider_arn" {
+  value = var.enable ? aws_iam_openid_connect_provider.eks[0].arn : null
+}
+
+output "node_role_arn" {
+  value = var.enable ? aws_iam_role.eks_node[0].arn : null
+}
+
+output "cluster_security_group_id" {
+  value = var.enable ? aws_eks_cluster.this[0].vpc_config[0].cluster_security_group_id : null
+}

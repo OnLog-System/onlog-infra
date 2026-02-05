@@ -276,3 +276,6 @@ $RECYCLE.BIN/
 .terraform/
 terraform.tfstate
 terraform.tfstate.*
+terraform.tfvars
+*.tfstate
+*.tfstate.backup
