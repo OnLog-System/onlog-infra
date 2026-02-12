@@ -51,7 +51,7 @@ module "onlog_prod_ec2" {
   security_group_ids = [module.sg_onlog_prod.id]
   key_name           = aws_key_pair.onlog_prod_labpc.key_name
 
-  instance_type    = "t4g.large"
+  instance_type    = "t4g.medium"
   data_volume_size = 100
 
   tags = local.tags
